@@ -69,8 +69,11 @@ class sokoban:
         return self.matrix[y][x]
     
     def set_cell_content(self,x,y,content):
-        self.matrix[y][x] = content
-        #Check valid content?
+        if self.is_valid_value(content):
+            self.matrix[y][x] = content
+        else:
+            print("ERROR: Value " + content + " is not valid to be added")
+    
 
     def player(self): #sets player to his acording starting cell depending on the level
         x = 0

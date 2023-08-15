@@ -11,6 +11,18 @@ class sokoban:
         PLAYER  = '@'
         PLAYER_ON_GOAL  = '+'
     
+    def is_valid_value(self, c):
+        if ( c == self.Icons.FLOOR or 
+            c == self.Icons.WALL  or 
+            c == self.Icons.PLAYER  or
+            c == self.Icons.GOAL  or 
+            c == self.Icons.BOX_ON_GOAL  or 
+            c == self.Icons.BOX  or 
+            c == self.Icons.PLAYER_ON_GOAL  ): 
+            return True
+        else:
+            return False
+
     def __init__(self, level, levels_file):
         self.level_state=[]
 
@@ -19,9 +31,29 @@ class sokoban:
         if level<1:
             print("ERROR: Level " + str(level) + " does not exist")
             sys.exit(1)
-        else:
+        else: # I have to load the level to the level_state matrix
             file= open(levels_file, 'r')
-            #prepare level
+            level_found = False
+            for line in file:
+                row = []
+                if not level_found:
+                    if  "Level "+str(level) == line.strip():
+                        level_found = True
+                else:
+                    if line.strip() != "":
+                        row = []
+                        for c in line:
+                            if c != '\n' and self.is_valid_value(c):
+                                row.append(c)
+                            elif c == '\n': #jump to next row when newline
+                                continue
+                            else:
+                                print ("ERROR: Level "+str(level)+" has invalid value "+c)
+                                sys.exit(1)
+                        self.level_state.append(row)
+                    else:
+                        break
+            
 
     def get_level_state(self):
         return self.level_state

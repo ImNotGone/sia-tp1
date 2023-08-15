@@ -66,11 +66,11 @@ class sokoban:
             sys.stdout.write('\n')
 
     def get_cell_content(self,x,y):
-        return self.matrix[y][x]
+        return self.level_state[y][x]
 
     def set_cell_content(self,x,y,content):
         if self.is_valid_value(content):
-            self.matrix[y][x] = content
+            self.level_state[y][x] = content
         else:
             print("ERROR: Value " + content + " is not valid to be added")
 
@@ -78,7 +78,7 @@ class sokoban:
     def player(self): #sets player to his acording starting cell depending on the level
         x = 0
         y = 0
-        for row in self.matrix:
+        for row in self.level_state:
             for pos in row:
                 if pos == self.Icons.PLAYER or pos == self.Icons.PLAYER_ON_GOAL:
                     return (x, y, pos)
@@ -88,7 +88,7 @@ class sokoban:
             x = 0
 
     def level_complete(self):
-        for row in self.matrix:
+        for row in self.level_state:
             for cell in row:
                 if cell == self.Icons.BOX:
                     return False

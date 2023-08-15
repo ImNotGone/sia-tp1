@@ -58,6 +58,13 @@ class sokoban:
     def get_level_state(self):
         return self.level_state
     
+    def print_level_state(self):
+        for row in self.level_state:
+            for char in row:
+                sys.stdout.write(char)
+                sys.stdout.flush()
+            sys.stdout.write('\n')
+    
     def get_cell_content(self,x,y):
         return self.matrix[y][x]
     

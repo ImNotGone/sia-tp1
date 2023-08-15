@@ -30,28 +30,29 @@ class sokoban:
         if level<1:
             print("ERROR: Level " + str(level) + " does not exist")
             sys.exit(1)
-        else: # I have to load the level to the level_state matrix
-            file= open(levels_file, 'r')
-            level_found = False
-            for line in file:
-                row = []
-                if not level_found:
-                    if  "Level "+str(level) == line.strip():
-                        level_found = True
+
+        # I have to load the level to the level_state matrix
+        file = open(levels_file, 'r')
+        level_found = False
+        for line in file:
+            row = []
+            if not level_found:
+                if  "Level "+str(level) == line.strip():
+                    level_found = True
+            else:
+                if line.strip() != "":
+                    row = []
+                    for c in line:
+                        if c != '\n' and self.is_valid_value(c):
+                            row.append(c)
+                        elif c == '\n': #jump to next row when newline
+                            continue
+                        else:
+                            print ("ERROR: Level "+str(level)+" has invalid value "+c)
+                            sys.exit(1)
+                    self.level_state.append(row)
                 else:
-                    if line.strip() != "":
-                        row = []
-                        for c in line:
-                            if c != '\n' and self.is_valid_value(c):
-                                row.append(c)
-                            elif c == '\n': #jump to next row when newline
-                                continue
-                            else:
-                                print ("ERROR: Level "+str(level)+" has invalid value "+c)
-                                sys.exit(1)
-                        self.level_state.append(row)
-                    else:
-                        break
+                    break
 
 
     def get_level_state(self):

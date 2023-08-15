@@ -86,6 +86,7 @@ class sokoban:
                     x = x + 1
             y = y + 1
             x = 0
+        raise RuntimeError("Player not found")
 
     def level_complete(self):
         for row in self.level_state:
@@ -173,9 +174,4 @@ class sokoban:
                 self.move_box(current[0]+x,current[1]+y,x,y)
                 self.set_cell_content(current[0],current[1], self.Icons.GOAL)
                 self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
-
-
-
-
-
 

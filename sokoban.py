@@ -10,18 +10,17 @@ class sokoban:
         BOX_ON_GOAL     = '*'
         PLAYER  = '@'
         PLAYER_ON_GOAL  = '+'
-    
+
     def is_valid_value(self, c):
-        if ( c == self.Icons.FLOOR or 
-            c == self.Icons.WALL  or 
+        return (
+            c == self.Icons.FLOOR   or
+            c == self.Icons.WALL    or
             c == self.Icons.PLAYER  or
-            c == self.Icons.GOAL  or 
-            c == self.Icons.BOX_ON_GOAL  or 
-            c == self.Icons.BOX  or 
-            c == self.Icons.PLAYER_ON_GOAL  ): 
-            return True
-        else:
-            return False
+            c == self.Icons.GOAL    or
+            c == self.Icons.BOX_ON_GOAL  or
+            c == self.Icons.BOX     or
+            c == self.Icons.PLAYER_ON_GOAL
+        )
 
     def __init__(self, level, levels_file):
         self.level_state=[]
@@ -53,27 +52,27 @@ class sokoban:
                         self.level_state.append(row)
                     else:
                         break
-            
+
 
     def get_level_state(self):
         return self.level_state
-    
+
     def print_level_state(self):
         for row in self.level_state:
             for char in row:
                 sys.stdout.write(char)
                 sys.stdout.flush()
             sys.stdout.write('\n')
-    
+
     def get_cell_content(self,x,y):
         return self.matrix[y][x]
-    
+
     def set_cell_content(self,x,y,content):
         if self.is_valid_value(content):
             self.matrix[y][x] = content
         else:
             print("ERROR: Value " + content + " is not valid to be added")
-    
+
 
     def player(self): #sets player to his acording starting cell depending on the level
         x = 0
@@ -93,7 +92,7 @@ class sokoban:
                 if cell == self.Icons.BOX:
                     return False
         return True
-    
+
     def move_box(self,x,y,a,b): #x and y is the position of the box while a and b are the posible movements of the box
         box= self.get_cell_content(x,y)
         moved_box= self.get_cell_content(x+a,y+b)
@@ -111,7 +110,7 @@ class sokoban:
             self.set_cell_content(x+a,y+b, self.Icons.BOX_ON_GOAL)
             self.set_cell_content(x,y, self.Icons.GOAL)
 
-        
+
     def can_move(self,x,y):
         return self.get_cell_content(self.player()[0]+x,self.player()[1]+y) not in [self.Icons.WALL,self.Icons.BOX_ON_GOAL,self.Icons.BOX]
 
@@ -120,7 +119,7 @@ class sokoban:
 
     def can_push(self,x,y):
         return (self.next(x,y) in [self.Icons.BOX_ON_GOAL,self.Icons.BOX] and self.next(x+x,y+y) in [self.Icons.FLOOR,self.Icons.GOAL])
-    
+
     def move_player(self,x,y):
         if self.can_move(x,y):
             current=self.player()
@@ -173,9 +172,9 @@ class sokoban:
                 self.move_box(current[0]+x,current[1]+y,x,y)
                 self.set_cell_content(current[0],current[1], self.Icons.GOAL)
                 self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
-                
 
 
-        
-        
-    
+
+
+
+

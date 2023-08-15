@@ -1,7 +1,7 @@
 import sys
 from enum import Enum
 
-class sokoban:
+class Sokoban:
     class Icons(Enum):
         WALL    = '#'
         FLOOR   = ' '
@@ -10,6 +10,13 @@ class sokoban:
         BOX_ON_GOAL     = '*'
         PLAYER  = '@'
         PLAYER_ON_GOAL  = '+'
+    
+    class Direction(Enum):
+        LEFT  = (-1,  0)
+        RIGTH = ( 1,  0)
+        UP    = ( 0, -1)
+        DOWN  = ( 0,  1)
+        NONE  = ( 0,  0)
 
     def is_valid_value(self, c):
         return (
@@ -43,13 +50,28 @@ class sokoban:
                 if line.strip() != "":
                     row = []
                     for c in line:
-                        if c != '\n' and self.is_valid_value(c):
-                            row.append(c)
-                        elif c == '\n': #jump to next row when newline
-                            continue
-                        else:
-                            print ("ERROR: Level "+str(level)+" has invalid value "+c)
-                            sys.exit(1)
+                        match c:
+                            case '\n':
+                                continue
+                            case self.Icons.FLOOR.value:  
+                                enum_value = self.Icons.FLOOR
+                            case self.Icons.WALL.value:  
+                                enum_value = self.Icons.WALL
+                            case self.Icons.PLAYER.value: 
+                                enum_value = self.Icons.PLAYER
+                            case self.Icons.GOAL.value:
+                                enum_value = self.Icons.GOAL
+                            case self.Icons.BOX_ON_GOAL.value:
+                                enum_value = self.Icons.BOX_ON_GOAL
+                            case self.Icons.BOX.value:
+                                enum_value = self.Icons.BOX
+                            case self.Icons.PLAYER_ON_GOAL.value:
+                                enum_value = self.Icons.PLAYER_ON_GOAL
+                            case _:
+                                print ("ERROR: Level "+str(level)+" has invalid value "+c)
+                                sys.exit(1)
+                        row.append(enum_value)
+
                     self.level_state.append(row)
                 else:
                     break
@@ -61,7 +83,7 @@ class sokoban:
     def print_level_state(self):
         for row in self.level_state:
             for char in row:
-                sys.stdout.write(char)
+                sys.stdout.write(char.value)
                 sys.stdout.flush()
             sys.stdout.write('\n')
 
@@ -95,7 +117,8 @@ class sokoban:
                     return False
         return True
 
-    def move_box(self,x,y,a,b): #x and y is the position of the box while a and b are the posible movements of the box
+    # private
+    def move_box(self,x,y, a, b): #x and y is the position of the box while a and b are the posible movements of the box
         box= self.get_cell_content(x,y)
         moved_box= self.get_cell_content(x+a,y+b)
 
@@ -113,19 +136,22 @@ class sokoban:
             self.set_cell_content(x,y, self.Icons.GOAL)
 
 
-    def can_move(self,x,y):
+    def can_move(self,  dir: Direction):
+        (x, y) = dir.value
         return self.get_cell_content(self.player()[0]+x,self.player()[1]+y) not in [self.Icons.WALL,self.Icons.BOX_ON_GOAL,self.Icons.BOX]
 
-    def next(self,x,y):
+    def next(self, x, y):
         return self.get_cell_content(self.player()[0]+x,self.player()[1]+y)
 
-    def can_push(self,x,y):
+    def can_push(self, dir: Direction):
+        (x, y) = dir.value
         return (self.next(x,y) in [self.Icons.BOX_ON_GOAL,self.Icons.BOX] and self.next(x+x,y+y) in [self.Icons.FLOOR,self.Icons.GOAL])
 
-    def move_player(self,x,y):
-        if self.can_move(x,y):
+    def move_player(self, dir: Direction):
+        (x, y) = dir.value
+        if self.can_move(dir):
             current=self.player()
-            next=self.next(x,y)
+            next=self.next(x, y)
             if current[2] == self.Icons.PLAYER and next == self.Icons.FLOOR:
                 self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER)
                 self.set_cell_content(current[0],current[1], self.Icons.FLOOR)
@@ -138,9 +164,9 @@ class sokoban:
             elif current[2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.GOAL:
                 self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
                 self.set_cell_content(current[0],current[1], self.Icons.GOAL)
-        elif self.can_push(x,y):
+        elif self.can_push(dir):
             current=self.player()
-            next=self.next(x,y)
+            next=self.next(x, y)
             moved_box= self.next(x+x, y+y)
             if current[2] == self.Icons.PLAYER and next == self.Icons.BOX and moved_box == self.Icons.FLOOR:
                 self.move_box(current[0]+x,current[1]+y,x,y)
@@ -175,3 +201,33 @@ class sokoban:
                 self.set_cell_content(current[0],current[1], self.Icons.GOAL)
                 self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
 
+
+
+def play():
+    level = 1
+    levels_file = "levels.txt"
+    sokoban = Sokoban(level, levels_file)
+
+    while(not sokoban.level_complete()):
+        valid = False
+        dir = Sokoban.Direction.NONE
+        while(not valid):
+            sokoban.print_level_state()
+            key = input("wasd:")
+            valid = True
+            match key:
+                case "w": 
+                    dir = Sokoban.Direction.UP
+                case "a":
+                    dir = Sokoban.Direction.LEFT
+                case "s":
+                    dir = Sokoban.Direction.DOWN
+                case "d":
+                    dir = Sokoban.Direction.RIGTH
+                case _:
+                    valid = False
+            if(valid and sokoban.can_move(dir) or sokoban.can_push(dir)):
+                sokoban.move_player(dir)       
+
+
+play()

@@ -2,38 +2,7 @@ from collections import defaultdict
 from sokoban import Sokoban
 import copy
 from queue import PriorityQueue
-
-
-class NodeSokoban:
-    def __init__(self, level_state):
-        self.level_state = level_state
-
-    def __key(self):
-        hashable_matrix = tuple(tuple(row) for row in self.level_state)
-        return hash(hashable_matrix)
-
-    def __hash__(self):
-        return hash(self.__key())
-
-    def get_level_state(self):
-        return self.level_state
-
-    def __str__(self):
-        string = ""
-        for row in self.level_state:
-            for char in row:
-                string += char.value
-            string += '\n'
-        return string
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        if self.level_state == other.level_state:
-            return True
-        else:
-            return False
-
+from sokoban import NodeSokoban
 
 class BFS:
 

@@ -1,40 +1,50 @@
 import sys
 from enum import Enum
+import copy
+
+
 
 class Sokoban:
     class Icons(Enum):
-        WALL    = '#'
-        FLOOR   = ' '
-        GOAL    = '.'
-        BOX     = '$'
-        BOX_ON_GOAL     = '*'
-        PLAYER  = '@'
-        PLAYER_ON_GOAL  = '+'
-    
+        WALL = '#'
+        FLOOR = ' '
+        GOAL = '.'
+        BOX = '$'
+        BOX_ON_GOAL = '*'
+        PLAYER = '@'
+        PLAYER_ON_GOAL = '+'
+
     class Direction(Enum):
-        LEFT  = (-1,  0)
-        RIGTH = ( 1,  0)
-        UP    = ( 0, -1)
-        DOWN  = ( 0,  1)
-        NONE  = ( 0,  0)
+        LEFT = (-1, 0)
+        RIGHT = (1, 0)
+        UP = (0, -1)
+        DOWN = (0, 1)
+        NONE = (0, 0)
 
     def is_valid_value(self, c):
         return (
-            c == self.Icons.FLOOR   or
-            c == self.Icons.WALL    or
-            c == self.Icons.PLAYER  or
-            c == self.Icons.GOAL    or
-            c == self.Icons.BOX_ON_GOAL  or
-            c == self.Icons.BOX     or
-            c == self.Icons.PLAYER_ON_GOAL
+                c == self.Icons.FLOOR or
+                c == self.Icons.WALL or
+                c == self.Icons.PLAYER or
+                c == self.Icons.GOAL or
+                c == self.Icons.BOX_ON_GOAL or
+                c == self.Icons.BOX or
+                c == self.Icons.PLAYER_ON_GOAL
         )
 
+    def get_valid_directions(self):
+        valid_moves = []
+        for direction in Sokoban.Direction:
+            if (self.can_move(direction) or self.can_push(direction)) and direction != self.Direction.NONE:
+                valid_moves.append(direction)
+        return valid_moves
+
     def __init__(self, level, levels_file):
-        self.level_state=[]
+        self.level_state = []
 
-        #levels_file will have all the sokoban levels inside them and with level you choose which one to play
+        # levels_file will have all the sokoban levels inside them and with level you choose which one to play
 
-        if level<1:
+        if level < 1:
             print("ERROR: Level " + str(level) + " does not exist")
             sys.exit(1)
 
@@ -42,9 +52,8 @@ class Sokoban:
         file = open(levels_file, 'r')
         level_found = False
         for line in file:
-            row = []
             if not level_found:
-                if  "Level "+str(level) == line.strip():
+                if "Level " + str(level) == line.strip():
                     level_found = True
             else:
                 if line.strip() != "":
@@ -53,11 +62,11 @@ class Sokoban:
                         match c:
                             case '\n':
                                 continue
-                            case self.Icons.FLOOR.value:  
+                            case self.Icons.FLOOR.value:
                                 enum_value = self.Icons.FLOOR
-                            case self.Icons.WALL.value:  
+                            case self.Icons.WALL.value:
                                 enum_value = self.Icons.WALL
-                            case self.Icons.PLAYER.value: 
+                            case self.Icons.PLAYER.value:
                                 enum_value = self.Icons.PLAYER
                             case self.Icons.GOAL.value:
                                 enum_value = self.Icons.GOAL
@@ -68,7 +77,7 @@ class Sokoban:
                             case self.Icons.PLAYER_ON_GOAL.value:
                                 enum_value = self.Icons.PLAYER_ON_GOAL
                             case _:
-                                print ("ERROR: Level "+str(level)+" has invalid value "+c)
+                                print("ERROR: Level " + str(level) + " has invalid value " + c)
                                 sys.exit(1)
                         row.append(enum_value)
 
@@ -76,9 +85,11 @@ class Sokoban:
                 else:
                     break
 
-
     def get_level_state(self):
         return self.level_state
+
+    def set_level_state(self, new_level_state):
+        self.level_state = copy.deepcopy(new_level_state)
 
     def print_level_state(self):
         for row in self.level_state:
@@ -87,17 +98,16 @@ class Sokoban:
                 sys.stdout.flush()
             sys.stdout.write('\n')
 
-    def get_cell_content(self,x,y):
+    def get_cell_content(self, x, y):
         return self.level_state[y][x]
 
-    def set_cell_content(self,x,y,content):
+    def set_cell_content(self, x, y, content):
         if self.is_valid_value(content):
             self.level_state[y][x] = content
         else:
             print("ERROR: Value " + content + " is not valid to be added")
 
-
-    def player(self): #sets player to his acording starting cell depending on the level
+    def player(self):  # sets player to his acording starting cell depending on the level
         x = 0
         y = 0
         for row in self.level_state:
@@ -118,116 +128,119 @@ class Sokoban:
         return True
 
     # private
-    def move_box(self,x,y, a, b): #x and y is the position of the box while a and b are the posible movements of the box
-        box= self.get_cell_content(x,y)
-        moved_box= self.get_cell_content(x+a,y+b)
+    def move_box(self, x, y, a,
+                 b):  # x and y is the position of the box while a and b are the posible movements of the box
+        box = self.get_cell_content(x, y)
+        moved_box = self.get_cell_content(x + a, y + b)
 
         if box == self.Icons.BOX and moved_box == self.Icons.FLOOR:
-            self.set_cell_content(x+a,y+b, self.Icons.BOX)
-            self.set_cell_content(x,y, self.Icons.FLOOR)
+            self.set_cell_content(x + a, y + b, self.Icons.BOX)
+            self.set_cell_content(x, y, self.Icons.FLOOR)
         elif box == self.Icons.BOX and moved_box == self.Icons.GOAL:
-            self.set_cell_content(x+a,y+b, self.Icons.BOX_ON_GOAL)
-            self.set_cell_content(x,y, self.Icons.FLOOR)
+            self.set_cell_content(x + a, y + b, self.Icons.BOX_ON_GOAL)
+            self.set_cell_content(x, y, self.Icons.FLOOR)
         elif box == self.Icons.BOX_ON_GOAL and moved_box == self.Icons.FLOOR:
-            self.set_cell_content(x+a,y+b, self.Icons.BOX)
-            self.set_cell_content(x,y, self.Icons.GOAL)
+            self.set_cell_content(x + a, y + b, self.Icons.BOX)
+            self.set_cell_content(x, y, self.Icons.GOAL)
         elif box == self.Icons.BOX_ON_GOAL and moved_box == self.Icons.GOAL:
-            self.set_cell_content(x+a,y+b, self.Icons.BOX_ON_GOAL)
-            self.set_cell_content(x,y, self.Icons.GOAL)
+            self.set_cell_content(x + a, y + b, self.Icons.BOX_ON_GOAL)
+            self.set_cell_content(x, y, self.Icons.GOAL)
 
-
-    def can_move(self,  dir: Direction):
+    def can_move(self, dir: Direction):
         (x, y) = dir.value
-        return self.get_cell_content(self.player()[0]+x,self.player()[1]+y) not in [self.Icons.WALL,self.Icons.BOX_ON_GOAL,self.Icons.BOX]
+        return self.get_cell_content(self.player()[0] + x, self.player()[1] + y) not in [self.Icons.WALL,
+                                                                                         self.Icons.BOX_ON_GOAL,
+                                                                                         self.Icons.BOX]
 
     def next(self, x, y):
-        return self.get_cell_content(self.player()[0]+x,self.player()[1]+y)
+        return self.get_cell_content(self.player()[0] + x, self.player()[1] + y)
 
     def can_push(self, dir: Direction):
         (x, y) = dir.value
-        return (self.next(x,y) in [self.Icons.BOX_ON_GOAL,self.Icons.BOX] and self.next(x+x,y+y) in [self.Icons.FLOOR,self.Icons.GOAL])
+        return (self.next(x, y) in [self.Icons.BOX_ON_GOAL, self.Icons.BOX] and self.next(x + x, y + y) in [
+            self.Icons.FLOOR, self.Icons.GOAL])
 
     def move_player(self, dir: Direction):
         (x, y) = dir.value
         if self.can_move(dir):
-            current=self.player()
-            next=self.next(x, y)
+            current = self.player()
+            next = self.next(x, y)
             if current[2] == self.Icons.PLAYER and next == self.Icons.FLOOR:
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER)
-                self.set_cell_content(current[0],current[1], self.Icons.FLOOR)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER)
+                self.set_cell_content(current[0], current[1], self.Icons.FLOOR)
             elif current[2] == self.Icons.PLAYER and next == self.Icons.GOAL:
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
-                self.set_cell_content(current[0],current[1], self.Icons.FLOOR)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER_ON_GOAL)
+                self.set_cell_content(current[0], current[1], self.Icons.FLOOR)
             elif current[2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.FLOOR:
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER)
-                self.set_cell_content(current[0],current[1], self.Icons.GOAL)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER)
+                self.set_cell_content(current[0], current[1], self.Icons.GOAL)
             elif current[2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.GOAL:
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
-                self.set_cell_content(current[0],current[1], self.Icons.GOAL)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER_ON_GOAL)
+                self.set_cell_content(current[0], current[1], self.Icons.GOAL)
         elif self.can_push(dir):
-            current=self.player()
-            next=self.next(x, y)
-            moved_box= self.next(x+x, y+y)
+            current = self.player()
+            next = self.next(x, y)
+            moved_box = self.next(x + x, y + y)
             if current[2] == self.Icons.PLAYER and next == self.Icons.BOX and moved_box == self.Icons.FLOOR:
-                self.move_box(current[0]+x,current[1]+y,x,y)
-                self.set_cell_content(current[0],current[1], self.Icons.FLOOR)
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER)
+                self.move_box(current[0] + x, current[1] + y, x, y)
+                self.set_cell_content(current[0], current[1], self.Icons.FLOOR)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER)
             elif current[2] == self.Icons.PLAYER and next == self.Icons.BOX and moved_box == self.Icons.GOAL:
-                self.move_box(current[0]+x,current[1]+y,x,y)
-                self.set_cell_content(current[0],current[1], self.Icons.FLOOR)
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER)
+                self.move_box(current[0] + x, current[1] + y, x, y)
+                self.set_cell_content(current[0], current[1], self.Icons.FLOOR)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER)
             elif current[2] == self.Icons.PLAYER and next == self.Icons.BOX_ON_GOAL and moved_box == self.Icons.FLOOR:
-                self.move_box(current[0]+x,current[1]+y,x,y)
-                self.set_cell_content(current[0],current[1], self.Icons.FLOOR)
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
+                self.move_box(current[0] + x, current[1] + y, x, y)
+                self.set_cell_content(current[0], current[1], self.Icons.FLOOR)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER_ON_GOAL)
             elif current[2] == self.Icons.PLAYER and next == self.Icons.BOX_ON_GOAL and moved_box == self.Icons.GOAL:
-                self.move_box(current[0]+x,current[1]+y,x,y)
-                self.set_cell_content(current[0],current[1], self.Icons.FLOOR)
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
+                self.move_box(current[0] + x, current[1] + y, x, y)
+                self.set_cell_content(current[0], current[1], self.Icons.FLOOR)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER_ON_GOAL)
             if current[2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.BOX and moved_box == self.Icons.FLOOR:
-                self.move_box(current[0]+x,current[1]+y,x,y)
-                self.set_cell_content(current[0],current[1], self.Icons.GOAL)
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER)
+                self.move_box(current[0] + x, current[1] + y, x, y)
+                self.set_cell_content(current[0], current[1], self.Icons.GOAL)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER)
             elif current[2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.BOX and moved_box == self.Icons.GOAL:
-                self.move_box(current[0]+x,current[1]+y,x,y)
-                self.set_cell_content(current[0],current[1], self.Icons.GOAL)
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
-            elif current[2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.BOX_ON_GOAL and moved_box == self.Icons.FLOOR:
-                self.move_box(current[0]+x,current[1]+y,x,y)
-                self.set_cell_content(current[0],current[1], self.Icons.GOAL)
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
-            elif current[2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.BOX_ON_GOAL and moved_box == self.Icons.GOAL:
-                self.move_box(current[0]+x,current[1]+y,x,y)
-                self.set_cell_content(current[0],current[1], self.Icons.GOAL)
-                self.set_cell_content(current[0]+x,current[1]+y, self.Icons.PLAYER_ON_GOAL)
-
+                self.move_box(current[0] + x, current[1] + y, x, y)
+                self.set_cell_content(current[0], current[1], self.Icons.GOAL)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER_ON_GOAL)
+            elif current[
+                2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.BOX_ON_GOAL and moved_box == self.Icons.FLOOR:
+                self.move_box(current[0] + x, current[1] + y, x, y)
+                self.set_cell_content(current[0], current[1], self.Icons.GOAL)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER_ON_GOAL)
+            elif current[
+                2] == self.Icons.PLAYER_ON_GOAL and next == self.Icons.BOX_ON_GOAL and moved_box == self.Icons.GOAL:
+                self.move_box(current[0] + x, current[1] + y, x, y)
+                self.set_cell_content(current[0], current[1], self.Icons.GOAL)
+                self.set_cell_content(current[0] + x, current[1] + y, self.Icons.PLAYER_ON_GOAL)
 
 
 def play():
-    level = 1
+    level = 10
     levels_file = "levels.txt"
     sokoban = Sokoban(level, levels_file)
 
-    while(not sokoban.level_complete()):
+    while (not sokoban.level_complete()):
         valid = False
         dir = Sokoban.Direction.NONE
-        while(not valid):
+        while (not valid):
             sokoban.print_level_state()
             key = input("wasd:")
             valid = True
             match key:
-                case "w": 
+                case "w":
                     dir = Sokoban.Direction.UP
                 case "a":
                     dir = Sokoban.Direction.LEFT
                 case "s":
                     dir = Sokoban.Direction.DOWN
                 case "d":
-                    dir = Sokoban.Direction.RIGTH
+                    dir = Sokoban.Direction.RIGHT
                 case _:
                     valid = False
-            if(valid and sokoban.can_move(dir) or sokoban.can_push(dir)):
-                sokoban.move_player(dir)       
+            if (valid and sokoban.can_move(dir) or sokoban.can_push(dir)):
+                sokoban.move_player(dir)
 
-
-play()
+# play()

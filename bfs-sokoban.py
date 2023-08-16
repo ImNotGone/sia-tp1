@@ -1,7 +1,3 @@
-# Python3 Program to print BFS traversal
-# from a given source vertex. BFS(int s)
-# traverses vertices reachable from s.
-
 from collections import defaultdict
 from sokoban import Sokoban
 import copy
@@ -37,19 +33,6 @@ class NodeSokoban:
             return True
         else:
             return False
-
-
-# This class represents a directed graph
-# using adjacency list representation
-def reconstruct_path(parents, target, start):
-    path = []
-    current = target
-    while not current == start:
-        path.append(current)
-        current = parents[current]
-    path.append(start)
-    path.reverse()
-    return path
 
 
 class BFS:
@@ -102,6 +85,17 @@ class BFS:
 
         for node in reconstruct_path(parents, current_node, NodeSokoban(first_state)):
             print(str(node))
+
+
+def reconstruct_path(parents, target, start):
+    path = []
+    current = target
+    while not current == start:
+        path.append(current)
+        current = parents[current]
+    path.append(start)
+    path.reverse()
+    return path
 
 
 bfs = BFS()

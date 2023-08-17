@@ -45,7 +45,12 @@ class Sokoban:
 
     def __init__(self, level: int, levels_file: str):
         self.level_state = []
-
+        self.boxes = set()
+        self.goals = set()
+        self.play=(0,0)
+        
+        x=0
+        y=0
         # levels_file will have all the sokoban levels inside them
         # level lets you choose which one to play
 
@@ -65,6 +70,8 @@ class Sokoban:
                     row = []
                     for c in line:
                         if c == "\n":
+                            y+=1
+                            x=0
                             continue
 
                         if not self.is_valid_value(c):
@@ -74,16 +81,53 @@ class Sokoban:
                             sys.exit(1)
 
                         row.append(self.Icons(c))
-
+                        point= (x,y)
+                        if c=='$':
+                            self.boxes.add(point)
+                        elif c=='.':
+                            self.goals.add(point)
+                        elif c=='*':
+                            self.boxes.add(point)
+                            self.goals.add(point)
+                        elif c=='+':
+                            self.play=(x,y)
+                            self.goals.add(point)
+                        elif c=='@':
+                            self.play=(x,y)
+                        x+=1
                     self.level_state.append(row)
                 else:
                     break
 
     def get_level_state(self):
         return self.level_state
+    
+    def get_play(self):
+        return self.play
+    
+    def get_boxes(self):
+        return self.boxes
+    
+    def get_goals(self):
+        return self.goals
 
     def set_level_state(self, new_level_state):
         self.level_state = copy.deepcopy(new_level_state)
+
+    def set_play(self, play):
+        self.play = play
+        
+    def set_boxes(self, boxes):
+        self.boxes = copy.deepcopy(boxes)
+        
+    def set_goals(self, goals):
+        self.goals = copy.deepcopy(goals)
+        
+    def set_status(self,new_level_state,play,boxes,goals):
+        self.level_state=copy.deepcopy(new_level_state)
+        self.play=play
+        self.boxes=copy.deepcopy(boxes)
+        self.goals=copy.deepcopy(goals)
 
     def print_level_state(self):
         for row in self.level_state:
@@ -154,6 +198,11 @@ class Sokoban:
             else self.Icons.BOX_ON_GOAL
         )
 
+        point= (x,y)
+        new_point=(x+x_diff,y+y_diff)
+        self.boxes.remove(point)
+        self.boxes.add(new_point)
+        
         self.set_cell_content(x, y, new_box_cell)
         self.set_cell_content(x + x_diff, y + y_diff, new_target_cell)
 
@@ -202,7 +251,7 @@ class Sokoban:
                 if target_cell == self.Icons.FLOOR
                 else self.Icons.PLAYER_ON_GOAL
             )
-
+            self.play=(player_x+x,player_y+y)
             self.set_cell_content(player_x, player_y, new_player_cell)
             self.set_cell_content(player_x + x, player_y + y, new_target_cell)
 
@@ -223,13 +272,16 @@ class Sokoban:
             )
 
             self._move_box(player_x + x, player_y + y, x, y)
-
+            self.play=(player_x+x,player_y+y)
             self.set_cell_content(player_x, player_y, new_player_cell)
             self.set_cell_content(player_x + x, player_y + y, new_target_cell)
 
 class NodeSokoban:
-    def __init__(self, level_state):
+    def __init__(self, level_state, player, boxes, goals):
         self.level_state = level_state
+        self.play = player
+        self.boxes = boxes
+        self.goals = goals
 
     def __key(self):
         hashable_matrix = tuple(tuple(row) for row in self.level_state)
@@ -240,6 +292,16 @@ class NodeSokoban:
 
     def get_level_state(self):
         return self.level_state
+    
+    def get_play(self):
+        return self.play
+    
+    def get_boxes(self):
+        return self.boxes
+    
+    def get_goals(self):
+        return self.goals
+    
 
     def __str__(self):
         string = ""
@@ -256,6 +318,33 @@ class NodeSokoban:
             return True
         else:
             return False
+        
+    def manhattan(self):
+        x, y = self.play
+        
+        playerToBoxes = 0;
+        
+        for  e in self.boxes: 
+            bx, by = e 
+            playerToBoxes += abs(x - bx) + abs(y - by)
+        
+        
+        boxesToStorages = 0
+
+        for e in self.goals:
+            ex, ey = e  
+            
+            minDistance = 0
+            
+            for m in self.boxes:
+                mx, my = m  
+                distance = abs(ex - mx) + abs(ey - my)
+                minDistance = min(minDistance, distance) 
+                
+            boxesToStorages += minDistance
+            
+        return playerToBoxes+boxesToStorages
+    
 
 
 
@@ -271,17 +360,16 @@ def play():
             sokoban.print_level_state()
             key = input("wasd:")
             valid = True
-            match key:
-                case "w":
-                    dir = Sokoban.Direction.UP
-                case "a":
-                    dir = Sokoban.Direction.LEFT
-                case "s":
-                    dir = Sokoban.Direction.DOWN
-                case "d":
-                    dir = Sokoban.Direction.RIGHT
-                case _:
-                    valid = False
+            if key == "w":
+                dir = Sokoban.Direction.UP
+            elif key == "a":
+                dir = Sokoban.Direction.LEFT
+            elif key == "s":
+                dir = Sokoban.Direction.DOWN
+            elif key == "d":
+                dir = Sokoban.Direction.RIGHT
+            else:
+                valid = False
             if (valid and sokoban.can_move(dir) or sokoban.can_push(dir)):
                 sokoban.move_player(dir)
 

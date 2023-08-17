@@ -1,16 +1,12 @@
-from sokoban import Sokoban
+from src.sokoban import Sokoban
 
-def play():
-    level = 10
-    levels_file = "levels.txt"
-    sokoban = Sokoban(level, levels_file)
-
+def play(sokoban: Sokoban):
     while (not sokoban.level_complete()):
         valid = False
         dir = Sokoban.Direction.NONE
         while (not valid):
             sokoban.print_level_state()
-            key = input("wasd:")
+            key = input("wasdq:")
             valid = True
             if key == "w":
                 dir = Sokoban.Direction.UP
@@ -20,9 +16,9 @@ def play():
                 dir = Sokoban.Direction.DOWN
             elif key == "d":
                 dir = Sokoban.Direction.RIGHT
+            elif key == "q":
+                return
             else:
                 valid = False
             if (valid and sokoban.can_move(dir) or sokoban.can_push(dir)):
                 sokoban.move_player(dir)
-
-play()

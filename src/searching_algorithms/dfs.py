@@ -42,7 +42,7 @@ def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
                     copy.deepcopy(sokoban.get_boxes()),
                     copy.deepcopy(sokoban.get_goals()),
                 )
-                if current_node not in parents:
+                if not sokoban.level_failed() and current_node not in parents:
                     i += 1
                     print(i)
                     stack.append((i, current_node))

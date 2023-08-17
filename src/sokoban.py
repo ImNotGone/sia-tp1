@@ -44,6 +44,7 @@ class Sokoban:
         self.boxes = set()
         self.goals = set()
         self.player=(0,0)
+        # self._level_failed = False
 
         x=0
         y=0
@@ -160,6 +161,18 @@ class Sokoban:
                 return False
         return True
 
+    def level_failed(self) -> bool:
+        # return self._level_failed
+        for box in self.boxes:
+            if box not in self.goals:
+                walls_in = set()
+                for direction in Sokoban.Direction:
+                    if(self.get_cell_content(box[0]+direction.value[0], box[1]+direction.value[1]) == Sokoban.Icons.WALL):
+                        walls_in.add(direction)
+                if (Sokoban.Direction.UP in walls_in or Sokoban.Direction.DOWN in walls_in) and (Sokoban.Direction.LEFT in walls_in or Sokoban.Direction.RIGHT in walls_in):
+                    return True
+        return False
+
     # private
     def _move_box(self, x: int, y: int, x_diff: int, y_diff: int):
         box_cell = self.get_cell_content(x, y)
@@ -190,6 +203,15 @@ class Sokoban:
 
         self.set_cell_content(x, y, new_box_cell)
         self.set_cell_content(x + x_diff, y + y_diff, new_target_cell)
+
+        '''
+        if new_point not in self.goals:
+            walls_in = set()
+            for direction in Sokoban.Direction:
+                if(self.get_cell_content(new_point[0]+direction.value[0], new_point[1]+direction.value[1]) == Sokoban.Icons.WALL):
+                    walls_in.add(direction)
+            self._level_failed = (Sokoban.Direction.UP in walls_in or Sokoban.Direction.DOWN in walls_in) and (Sokoban.Direction.LEFT in walls_in or Sokoban.Direction.RIGHT in walls_in)
+        '''
 
     def can_move(self, direction: Direction) -> bool:
         player_x, player_y = self.player

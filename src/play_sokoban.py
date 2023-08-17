@@ -1,7 +1,7 @@
 from src.sokoban import Sokoban
 
 def play(sokoban: Sokoban):
-    while (not sokoban.level_complete()):
+    while (not sokoban.level_complete() and not sokoban.level_failed()):
         valid = False
         dir = Sokoban.Direction.NONE
         while (not valid):
@@ -22,3 +22,9 @@ def play(sokoban: Sokoban):
                 valid = False
             if (valid and sokoban.can_move(dir) or sokoban.can_push(dir)):
                 sokoban.move_player(dir)
+
+    sokoban.print_level_state()
+    if (sokoban.level_complete()):
+        print("Level complete!")
+    else:
+        print("Level failed!")

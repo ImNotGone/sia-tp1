@@ -1,4 +1,3 @@
-from collections import defaultdict
 from typing import Tuple
 from src.sokoban import Sokoban, NodeSokoban
 from src.utils import reconstruct_path

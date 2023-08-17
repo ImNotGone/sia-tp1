@@ -1,4 +1,3 @@
-from collections import defaultdict
 from typing import Tuple
 from queue import PriorityQueue
 from src.sokoban import Sokoban, NodeSokoban

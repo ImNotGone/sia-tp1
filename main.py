@@ -1,6 +1,7 @@
 import json
 
 from src.sokoban import Sokoban
+from src.play_sokoban import play
 
 from src.searching_algorithms.bfs import bfs
 from src.searching_algorithms.dfs import dfs
@@ -17,6 +18,11 @@ def main():
         level = config['level']
         
         sokoban = Sokoban(level, levels_file)
+
+        if config['user_play']:
+            play(sokoban)
+            exit(0)
+
 
         # TODO: Inject euristic function to searching algorithm
         match config['searching_algorithm']:

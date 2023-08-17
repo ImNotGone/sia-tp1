@@ -1,4 +1,5 @@
 {
+  "user_play": false,
   "searching_algorithm": "bfs",
   "heuristic": "manhattan",
   "level": 54,

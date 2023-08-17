@@ -1,10 +1,6 @@
 import sys
-from typing import Tuple
 from enum import Enum
 import copy
-
-
-
 
 class Sokoban:
     class Icons(Enum):
@@ -301,12 +297,7 @@ class NodeSokoban:
         return string
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        if self.level_state == other.level_state:
-            return True
-        else:
-            return False
+        return isinstance(other, self.__class__) and self.level_state == other.level_state
 
     def manhattan(self):
         x, y = self.player
@@ -316,7 +307,6 @@ class NodeSokoban:
         for  e in self.boxes:
             bx, by = e
             playerToBoxes += abs(x - bx) + abs(y - by)
-
 
         boxesToStorages = 0
 

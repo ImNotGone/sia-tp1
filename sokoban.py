@@ -48,7 +48,7 @@ class Sokoban:
         self.boxes = set()
         self.goals = set()
         self.play=(0,0)
-        
+
         x=0
         y=0
         # levels_file will have all the sokoban levels inside them
@@ -66,48 +66,50 @@ class Sokoban:
                 if "Level " + str(level) == line.strip():
                     level_found = True
             else:
-                if line.strip() != "":
-                    row = []
-                    for c in line:
-                        if c == "\n":
-                            y+=1
-                            x=0
-                            continue
-
-                        if not self.is_valid_value(c):
-                            print(
-                                "ERROR: Level " + str(level) + " has invalid value " + c
-                            )
-                            sys.exit(1)
-
-                        row.append(self.Icons(c))
-                        point= (x,y)
-                        if c=='$':
-                            self.boxes.add(point)
-                        elif c=='.':
-                            self.goals.add(point)
-                        elif c=='*':
-                            self.boxes.add(point)
-                            self.goals.add(point)
-                        elif c=='+':
-                            self.play=(x,y)
-                            self.goals.add(point)
-                        elif c=='@':
-                            self.play=(x,y)
-                        x+=1
-                    self.level_state.append(row)
-                else:
+                # si se termino el nivel -> salgo del loop
+                if line.strip() == "":
                     break
+
+                row = []
+                for c in line:
+                    if c == "\n":
+                        y+=1
+                        x=0
+                        continue
+
+                    if not self.is_valid_value(c):
+                        print(
+                            "ERROR: Level " + str(level) + " has invalid value " + c
+                        )
+                        sys.exit(1)
+
+                    row.append(self.Icons(c))
+                    point= (x,y)
+                    match c:
+                        case '$':
+                            self.boxes.add(point)
+                        case '.':
+                            self.goals.add(point)
+                        case '*':
+                            self.boxes.add(point)
+                            self.goals.add(point)
+                        case '+':
+                            self.play=(x,y)
+                            self.goals.add(point)
+                        case '@':
+                            self.play=(x,y)
+                    x+=1
+                self.level_state.append(row)
 
     def get_level_state(self):
         return self.level_state
-    
+
     def get_play(self):
         return self.play
-    
+
     def get_boxes(self):
         return self.boxes
-    
+
     def get_goals(self):
         return self.goals
 
@@ -116,13 +118,13 @@ class Sokoban:
 
     def set_play(self, play):
         self.play = play
-        
+
     def set_boxes(self, boxes):
         self.boxes = copy.deepcopy(boxes)
-        
+
     def set_goals(self, goals):
         self.goals = copy.deepcopy(goals)
-        
+
     def set_status(self,new_level_state,play,boxes,goals):
         self.level_state=copy.deepcopy(new_level_state)
         self.play=play
@@ -202,7 +204,7 @@ class Sokoban:
         new_point=(x+x_diff,y+y_diff)
         self.boxes.remove(point)
         self.boxes.add(new_point)
-        
+
         self.set_cell_content(x, y, new_box_cell)
         self.set_cell_content(x + x_diff, y + y_diff, new_target_cell)
 
@@ -292,16 +294,16 @@ class NodeSokoban:
 
     def get_level_state(self):
         return self.level_state
-    
+
     def get_play(self):
         return self.play
-    
+
     def get_boxes(self):
         return self.boxes
-    
+
     def get_goals(self):
         return self.goals
-    
+
 
     def __str__(self):
         string = ""
@@ -318,33 +320,33 @@ class NodeSokoban:
             return True
         else:
             return False
-        
+
     def manhattan(self):
         x, y = self.play
-        
+
         playerToBoxes = 0;
-        
-        for  e in self.boxes: 
-            bx, by = e 
+
+        for  e in self.boxes:
+            bx, by = e
             playerToBoxes += abs(x - bx) + abs(y - by)
-        
-        
+
+
         boxesToStorages = 0
 
         for e in self.goals:
-            ex, ey = e  
-            
+            ex, ey = e
+
             minDistance = 0
-            
+
             for m in self.boxes:
-                mx, my = m  
+                mx, my = m
                 distance = abs(ex - mx) + abs(ey - my)
-                minDistance = min(minDistance, distance) 
-                
+                minDistance = min(minDistance, distance)
+
             boxesToStorages += minDistance
-            
+
         return playerToBoxes+boxesToStorages
-    
+
 
 
 

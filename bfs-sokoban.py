@@ -24,7 +24,7 @@ class BFS:
         sokoban = Sokoban(level, levels_file)
 
         first_state = copy.deepcopy(sokoban.get_level_state())
-        player = sokoban.get_play()
+        player = sokoban.get_player()
         boxes = copy.deepcopy(sokoban.get_boxes())
         goals = copy.deepcopy(sokoban.get_goals())
 
@@ -41,16 +41,16 @@ class BFS:
             # Dequeue a level_state from queue and set it in sokoban instance
             s_node = queue.get()[1]
             s_level_state = copy.deepcopy(s_node.get_level_state())
-            player = copy.deepcopy(s_node.get_play())
+            player = copy.deepcopy(s_node.get_player())
             boxes = copy.deepcopy(s_node.get_boxes())
             goals = copy.deepcopy(s_node.get_goals())
-            
+
             sokoban.set_status(s_level_state,player,boxes,goals)
             # Get all adjacent vertices of the dequeued vertex s.
             for direction in sokoban.get_valid_directions():
                 if sokoban.can_move(direction) or sokoban.can_push(direction):
                     sokoban.move_player(direction)
-                    current_node = NodeSokoban(copy.deepcopy(sokoban.get_level_state()),copy.deepcopy(sokoban.get_play()),copy.deepcopy(sokoban.get_boxes()),copy.deepcopy(sokoban.get_goals()))
+                    current_node = NodeSokoban(copy.deepcopy(sokoban.get_level_state()),copy.deepcopy(sokoban.get_player()),copy.deepcopy(sokoban.get_boxes()),copy.deepcopy(sokoban.get_goals()))
                     if current_node not in parents:
                         i += 1
                         #print(i)
@@ -59,8 +59,8 @@ class BFS:
                         if sokoban.level_complete():
                             break
                     sokoban.set_status(s_level_state,player,boxes,goals)  # We go back to the parent state we were evaluating
-                    
-        
+
+
 
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -69,7 +69,7 @@ class BFS:
             print(str(node))
 
 
-   
+
 
 def reconstruct_path(parents, target, start):
     path = []
@@ -83,4 +83,4 @@ def reconstruct_path(parents, target, start):
 
 
 bfs = BFS()
-bfs.bfs(54)
+bfs.bfs(55)

@@ -47,7 +47,7 @@ class Sokoban:
         self.level_state = []
         self.boxes = set()
         self.goals = set()
-        self.play=(0,0)
+        self.player=(0,0)
 
         x=0
         y=0
@@ -94,18 +94,18 @@ class Sokoban:
                             self.boxes.add(point)
                             self.goals.add(point)
                         case '+':
-                            self.play=(x,y)
+                            self.player=(x,y)
                             self.goals.add(point)
                         case '@':
-                            self.play=(x,y)
+                            self.player=(x,y)
                     x+=1
                 self.level_state.append(row)
 
     def get_level_state(self):
         return self.level_state
 
-    def get_play(self):
-        return self.play
+    def get_player(self):
+        return self.player
 
     def get_boxes(self):
         return self.boxes
@@ -116,8 +116,8 @@ class Sokoban:
     def set_level_state(self, new_level_state):
         self.level_state = copy.deepcopy(new_level_state)
 
-    def set_play(self, play):
-        self.play = play
+    def set_player(self, player):
+        self.player = player
 
     def set_boxes(self, boxes):
         self.boxes = copy.deepcopy(boxes)
@@ -127,7 +127,7 @@ class Sokoban:
 
     def set_status(self,new_level_state,play,boxes,goals):
         self.level_state=copy.deepcopy(new_level_state)
-        self.play=play
+        self.player=play
         self.boxes=copy.deepcopy(boxes)
         self.goals=copy.deepcopy(goals)
 
@@ -157,18 +157,6 @@ class Sokoban:
             raise RuntimeError("Cell is out of bounds")
 
         self.level_state[y][x] = content
-
-    def player(
-        self,
-    ) -> Tuple[
-        int, int, Icons
-    ]:  # sets player to his acording starting cell depending on the level
-        for y, row in enumerate(self.level_state):
-            for x, cell in enumerate(row):
-                if cell == self.Icons.PLAYER or cell == self.Icons.PLAYER_ON_GOAL:
-                    return (x, y, cell)
-
-        raise RuntimeError("Player not found")
 
     def level_complete(self) -> bool:
         for row in self.level_state:
@@ -209,7 +197,7 @@ class Sokoban:
         self.set_cell_content(x + x_diff, y + y_diff, new_target_cell)
 
     def can_move(self, direction: Direction) -> bool:
-        player_x, player_y, _ = self.player()
+        player_x, player_y = self.player
         x_diff, y_diff = direction.value
 
         target_cell = self.get_cell_content(player_x + x_diff, player_y + y_diff)
@@ -217,19 +205,20 @@ class Sokoban:
 
         return target_cell not in invalid_cells
 
-    def next(self, x: int, y: int) -> Icons:
-        player_x, player_y, _ = self.player()
+    # private
+    def _next(self, x: int, y: int) -> Icons:
+        player_x, player_y = self.player
 
         return self.get_cell_content(player_x + x, player_y + y)
 
     def can_push(self, dir: Direction) -> bool:
         (x, y) = dir.value
 
-        player_is_adjacent_to_box = self.next(x, y) in [
+        player_is_adjacent_to_box = self._next(x, y) in [
             self.Icons.BOX,
             self.Icons.BOX_ON_GOAL,
         ]
-        box_can_be_pushed = self.next(x + x, y + y) in [
+        box_can_be_pushed = self._next(x + x, y + y) in [
             self.Icons.FLOOR,
             self.Icons.GOAL,
         ]
@@ -239,12 +228,12 @@ class Sokoban:
     def move_player(self, dir: Direction):
         (x, y) = dir.value
         if self.can_move(dir):
-            player_x, player_y, player_cell = self.player()
-            target_cell = self.next(x, y)
+            player_x, player_y = self.player
+            target_cell = self._next(x, y)
 
             new_player_cell = (
                 self.Icons.FLOOR
-                if player_cell == self.Icons.PLAYER
+                if (player_x, player_y) not in self.goals
                 else self.Icons.GOAL
             )
 
@@ -253,17 +242,17 @@ class Sokoban:
                 if target_cell == self.Icons.FLOOR
                 else self.Icons.PLAYER_ON_GOAL
             )
-            self.play=(player_x+x,player_y+y)
+            self.player=(player_x+x,player_y+y)
             self.set_cell_content(player_x, player_y, new_player_cell)
             self.set_cell_content(player_x + x, player_y + y, new_target_cell)
 
         elif self.can_push(dir):
-            player_x, player_y, player_cell = self.player()
-            target_cell = self.next(x, y)
+            player_x, player_y = self.player
+            target_cell = self._next(x, y)
 
             new_player_cell = (
                 self.Icons.FLOOR
-                if player_cell == self.Icons.PLAYER
+                if (player_x, player_y) not in self.goals
                 else self.Icons.GOAL
             )
 
@@ -274,14 +263,14 @@ class Sokoban:
             )
 
             self._move_box(player_x + x, player_y + y, x, y)
-            self.play=(player_x+x,player_y+y)
+            self.player=(player_x+x,player_y+y)
             self.set_cell_content(player_x, player_y, new_player_cell)
             self.set_cell_content(player_x + x, player_y + y, new_target_cell)
 
 class NodeSokoban:
     def __init__(self, level_state, player, boxes, goals):
         self.level_state = level_state
-        self.play = player
+        self.player = player
         self.boxes = boxes
         self.goals = goals
 
@@ -295,15 +284,14 @@ class NodeSokoban:
     def get_level_state(self):
         return self.level_state
 
-    def get_play(self):
-        return self.play
+    def get_player(self):
+        return self.player
 
     def get_boxes(self):
         return self.boxes
 
     def get_goals(self):
         return self.goals
-
 
     def __str__(self):
         string = ""
@@ -322,7 +310,7 @@ class NodeSokoban:
             return False
 
     def manhattan(self):
-        x, y = self.play
+        x, y = self.player
 
         playerToBoxes = 0;
 

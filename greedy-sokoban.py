@@ -15,7 +15,7 @@ class GREEDY:
     # Function to add an edge to graph
     def addEdge(self, u, v):
         self.graph[u].append(v)
-        
+
     def greedy(self, lvl: int):
             start_time = time.time()
             level = lvl
@@ -23,7 +23,7 @@ class GREEDY:
             sokoban = Sokoban(level, levels_file)
 
             first_state = copy.deepcopy(sokoban.get_level_state())
-            player = copy.deepcopy(sokoban.get_play())
+            player = copy.deepcopy(sokoban.get_player())
             boxes = copy.deepcopy(sokoban.get_boxes())
             goals = copy.deepcopy(sokoban.get_goals())
 
@@ -40,17 +40,17 @@ class GREEDY:
                 # Dequeue a level_state from queue and set it in sokoban instance
                 s_node = queue.get()[2]
                 s_level_state = copy.deepcopy(s_node.get_level_state())
-                player = copy.deepcopy(s_node.get_play())
+                player = copy.deepcopy(s_node.get_player())
                 boxes = copy.deepcopy(s_node.get_boxes())
                 goals = copy.deepcopy(s_node.get_goals())
-                
+
                 sokoban.set_status(s_level_state,player,boxes,goals)
 
                 # Get all adjacent vertices of the dequeued vertex s.
                 for direction in sokoban.get_valid_directions():
                     if sokoban.can_move(direction) or sokoban.can_push(direction):
                         sokoban.move_player(direction)
-                        current_node = NodeSokoban(copy.deepcopy(sokoban.get_level_state()),copy.deepcopy(sokoban.get_play()),copy.deepcopy(sokoban.get_boxes()),copy.deepcopy(sokoban.get_goals()))
+                        current_node = NodeSokoban(copy.deepcopy(sokoban.get_level_state()),copy.deepcopy(sokoban.get_player()),copy.deepcopy(sokoban.get_boxes()),copy.deepcopy(sokoban.get_goals()))
                         if current_node not in parents:
                             i += 1
                             #print(current_node.manhattan())
@@ -59,7 +59,7 @@ class GREEDY:
                             if sokoban.level_complete():
                                 break
                         sokoban.set_status(s_level_state,player,boxes,goals) # We go back to the parent state we were evaluating
-        
+
             end_time = time.time()
             elapsed_time = end_time - start_time
             print(f"Elapsed time: {elapsed_time} seconds")
@@ -78,4 +78,4 @@ def reconstruct_path(parents, target, start):
 
 
 greedy = GREEDY()
-greedy.greedy(54)
+greedy.greedy(55)

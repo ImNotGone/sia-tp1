@@ -9,9 +9,6 @@ import time
 # Function to print a DFS of graph
 def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
     start_time = time.time()
-    """ level= lvl """
-    """ levels_file= "levels.txt" """
-    """ sokoban = Sokoban(level, levels_file) """
 
     first_state = copy.deepcopy(sokoban.get_level_state())
     player = sokoban.get_play()
@@ -55,7 +52,5 @@ def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
     end_time = time.time()
     elapsed_time = end_time - start_time
     path_to_solution = reconstruct_path(parents, current_node, NodeSokoban(first_state,player,boxes,goals))
-    """ print(f"Elapsed time: {elapsed_time} seconds") """
-    """ for node in reconstruct_path(parents, current_node, NodeSokoban(first_state,player,boxes,goals)): """
-    """     print(str(node)) """
+
     return path_to_solution, elapsed_time

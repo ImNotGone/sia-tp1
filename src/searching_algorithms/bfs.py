@@ -9,9 +9,6 @@ import time
 # Function to print a BFS of graph
 def bfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
     start_time = time.time()
-    """ level = lvl """
-    """ levels_file = "levels.txt" """
-    """ sokoban = Sokoban(level, levels_file) """
 
 
     first_state = copy.deepcopy(sokoban.get_level_state())
@@ -19,13 +16,13 @@ def bfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
     boxes = copy.deepcopy(sokoban.get_boxes())
     goals = copy.deepcopy(sokoban.get_goals())
 
-# Create a queue for BFS with the initial level_state as the first item in the queue
+    # Create a queue for BFS with the initial level_state as the first item in the queue
     queue = PriorityQueue()
     i = 0
     current_node = NodeSokoban(first_state,player,boxes,goals)
     queue.put((i, current_node))
 
-# Create dictionary for parents so that I can reconstruct path
+    # Create dictionary for parents so that I can reconstruct path
     parents = {}
 
     while queue and not sokoban.level_complete():
@@ -56,7 +53,5 @@ def bfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
     end_time = time.time()
     elapsed_time = end_time - start_time
     path_to_solution = reconstruct_path(parents, current_node, NodeSokoban(first_state,player,boxes,goals))
-    """ print(f"Elapsed time: {elapsed_time} seconds") """
-    """ for node in reconstruct_path(parents, current_node, NodeSokoban(first_state,player,boxes,goals)): """
-    """     print(str(node)) """
+
     return path_to_solution, elapsed_time

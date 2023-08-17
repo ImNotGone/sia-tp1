@@ -1,0 +1,7 @@
+{
+  "user_play": false,
+  "searching_algorithm": "bfs",
+  "heuristic": "manhattan",
+  "level": 54,
+  "levels_file": "levels.txt"
+}

@@ -159,10 +159,9 @@ class Sokoban:
         self.level_state[y][x] = content
 
     def level_complete(self) -> bool:
-        for row in self.level_state:
-            for cell in row:
-                if cell == self.Icons.BOX:
-                    return False
+        for box in self.boxes:
+            if box not in self.goals:
+                return False
         return True
 
     # private

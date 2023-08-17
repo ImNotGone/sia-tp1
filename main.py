@@ -1,4 +1,5 @@
 import json
+import time
 
 from src.sokoban import Sokoban
 from src.play_sokoban import play
@@ -23,8 +24,14 @@ def main():
             play(sokoban)
             exit(0)
 
+        search_algorithm = config["searching_algorithm"]
+
+        print(f"Calculating solution using {search_algorithm} algorithm")
+        sokoban.print_level_state()
+        print(f"Level: {level}")
+
         # TODO: Inject euristic function to searching algorithm
-        match config["searching_algorithm"]:
+        match search_algorithm:
             case "bfs":
                 path_to_solution, elapsed_time = bfs(sokoban)
             case "dfs":
@@ -35,9 +42,15 @@ def main():
                 raise Exception("Invalid searching algorithm")
 
         # Print solution
-        print(f"Elapsed time: {elapsed_time} seconds")
         for node in path_to_solution:
+            # Clear screen
+            print("\033c", end="")
+
             print(str(node))
+
+            time.sleep(0.1)
+
+        print(f"Elapsed time: {elapsed_time}")
 
 
 if __name__ == "__main__":

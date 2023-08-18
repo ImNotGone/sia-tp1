@@ -41,16 +41,19 @@ def main():
             case _:
                 raise Exception("Invalid searching algorithm")
 
+                
         # Print solution
         for node in path_to_solution:
             # Clear screen
             print("\033c", end="")
 
-            print(str(node))
+            sokoban.set_status(node.get_player(), node.get_boxes())
+            sokoban.print_level_state()
 
             time.sleep(0.1)
 
         print(f"Elapsed time: {elapsed_time}")
+        print(f"Number of steps: {len(path_to_solution)}")
 
 
 if __name__ == "__main__":

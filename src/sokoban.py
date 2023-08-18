@@ -1,16 +1,18 @@
 import sys
 from enum import Enum
+from typing import Tuple, Set
 import copy
+
 
 class Sokoban:
     class Icons(Enum):
-        WALL = '#'
-        FLOOR = ' '
-        GOAL = '.'
-        BOX = '$'
-        BOX_ON_GOAL = '*'
-        PLAYER = '@'
-        PLAYER_ON_GOAL = '+'
+        WALL = "#"
+        FLOOR = " "
+        GOAL = "."
+        BOX = "$"
+        BOX_ON_GOAL = "*"
+        PLAYER = "@"
+        PLAYER_ON_GOAL = "+"
 
     class Direction(Enum):
         LEFT = (-1, 0)
@@ -18,7 +20,6 @@ class Sokoban:
         UP = (0, -1)
         DOWN = (0, 1)
         NONE = (0, 0)
-
 
     def is_valid_value(self, c) -> bool:
         valid_values = {
@@ -35,7 +36,9 @@ class Sokoban:
     def get_valid_directions(self):
         valid_moves = []
         for direction in Sokoban.Direction:
-            if (self.can_move(direction) or self.can_push(direction)) and direction != self.Direction.NONE:
+            if (
+                self.can_move(direction) or self.can_push(direction)
+            ) and direction != self.Direction.NONE:
                 valid_moves.append(direction)
         return valid_moves
 
@@ -43,11 +46,11 @@ class Sokoban:
         self.level_state = []
         self.boxes = set()
         self.goals = set()
-        self.player=(0,0)
+        self.player = (0, 0)
         # self._level_failed = False
 
-        x=0
-        y=0
+        x = 0
+        y = 0
         # levels_file will have all the sokoban levels inside them
         # level lets you choose which one to play
 
@@ -70,32 +73,30 @@ class Sokoban:
                 row = []
                 for c in line:
                     if c == "\n":
-                        y+=1
-                        x=0
+                        y += 1
+                        x = 0
                         continue
 
                     if not self.is_valid_value(c):
-                        print(
-                            "ERROR: Level " + str(level) + " has invalid value " + c
-                        )
+                        print("ERROR: Level " + str(level) + " has invalid value " + c)
                         sys.exit(1)
 
                     row.append(self.Icons(c))
-                    point= (x,y)
+                    point = (x, y)
                     match c:
-                        case '$':
+                        case "$":
                             self.boxes.add(point)
-                        case '.':
+                        case ".":
                             self.goals.add(point)
-                        case '*':
+                        case "*":
                             self.boxes.add(point)
                             self.goals.add(point)
-                        case '+':
-                            self.player=(x,y)
+                        case "+":
+                            self.player = (x, y)
                             self.goals.add(point)
-                        case '@':
-                            self.player=(x,y)
-                    x+=1
+                        case "@":
+                            self.player = (x, y)
+                    x += 1
                 self.level_state.append(row)
 
     def get_level_state(self):
@@ -122,11 +123,51 @@ class Sokoban:
     def set_goals(self, goals):
         self.goals = copy.deepcopy(goals)
 
-    def set_status(self,new_level_state,play,boxes,goals):
-        self.level_state=copy.deepcopy(new_level_state)
-        self.player=play
-        self.boxes=copy.deepcopy(boxes)
-        self.goals=copy.deepcopy(goals)
+    def set_status(self, player: Tuple[int, int], boxes: Set[Tuple[int, int]]):
+        player_x, player_y = self.player
+        player_cell = (
+            self.Icons.FLOOR
+            if (self.get_cell_content(player_x, player_y) == self.Icons.PLAYER)
+            else self.Icons.GOAL
+        )
+        self.set_cell_content(player_x, player_y, player_cell)
+
+        new_player_x, new_player_y = player
+        new_player_cell = (
+            self.Icons.PLAYER
+            if (
+                self.get_cell_content(new_player_x, new_player_y)
+                in (self.Icons.FLOOR, self.Icons.BOX)
+            )
+            else self.Icons.PLAYER_ON_GOAL
+        )
+        self.set_cell_content(new_player_x, new_player_y, new_player_cell)
+
+        for new_box in boxes.difference(self.boxes):
+            new_box_x, new_box_y = new_box
+
+            new_box_cell = (
+                self.Icons.BOX
+                if (self.get_cell_content(new_box_x, new_box_y) == self.Icons.FLOOR)
+                else self.Icons.BOX_ON_GOAL
+            )
+
+            self.set_cell_content(new_box_x, new_box_y, new_box_cell)
+
+        for box in self.boxes.difference(boxes):
+            box_x, box_y = box
+
+            box_cell = (
+                self.Icons.FLOOR
+                if (self.get_cell_content(box_x, box_y) == self.Icons.BOX)
+                else self.Icons.GOAL
+            )
+
+            if box != player:
+                self.set_cell_content(box_x, box_y, box_cell)
+
+        self.player = player
+        self.boxes = copy.deepcopy(boxes)
 
     def print_level_state(self):
         for row in self.level_state:
@@ -167,9 +208,20 @@ class Sokoban:
             if box not in self.goals:
                 walls_in = set()
                 for direction in Sokoban.Direction:
-                    if(self.get_cell_content(box[0]+direction.value[0], box[1]+direction.value[1]) == Sokoban.Icons.WALL):
+                    if (
+                        self.get_cell_content(
+                            box[0] + direction.value[0], box[1] + direction.value[1]
+                        )
+                        == Sokoban.Icons.WALL
+                    ):
                         walls_in.add(direction)
-                if (Sokoban.Direction.UP in walls_in or Sokoban.Direction.DOWN in walls_in) and (Sokoban.Direction.LEFT in walls_in or Sokoban.Direction.RIGHT in walls_in):
+                if (
+                    Sokoban.Direction.UP in walls_in
+                    or Sokoban.Direction.DOWN in walls_in
+                ) and (
+                    Sokoban.Direction.LEFT in walls_in
+                    or Sokoban.Direction.RIGHT in walls_in
+                ):
                     return True
         return False
 
@@ -196,22 +248,22 @@ class Sokoban:
             else self.Icons.BOX_ON_GOAL
         )
 
-        point= (x,y)
-        new_point=(x+x_diff,y+y_diff)
+        point = (x, y)
+        new_point = (x + x_diff, y + y_diff)
         self.boxes.remove(point)
         self.boxes.add(new_point)
 
         self.set_cell_content(x, y, new_box_cell)
         self.set_cell_content(x + x_diff, y + y_diff, new_target_cell)
 
-        '''
+        """
         if new_point not in self.goals:
             walls_in = set()
             for direction in Sokoban.Direction:
                 if(self.get_cell_content(new_point[0]+direction.value[0], new_point[1]+direction.value[1]) == Sokoban.Icons.WALL):
                     walls_in.add(direction)
             self._level_failed = (Sokoban.Direction.UP in walls_in or Sokoban.Direction.DOWN in walls_in) and (Sokoban.Direction.LEFT in walls_in or Sokoban.Direction.RIGHT in walls_in)
-        '''
+        """
 
     def can_move(self, direction: Direction) -> bool:
         player_x, player_y = self.player
@@ -259,7 +311,7 @@ class Sokoban:
                 if target_cell == self.Icons.FLOOR
                 else self.Icons.PLAYER_ON_GOAL
             )
-            self.player=(player_x+x,player_y+y)
+            self.player = (player_x + x, player_y + y)
             self.set_cell_content(player_x, player_y, new_player_cell)
             self.set_cell_content(player_x + x, player_y + y, new_target_cell)
 
@@ -280,26 +332,21 @@ class Sokoban:
             )
 
             self._move_box(player_x + x, player_y + y, x, y)
-            self.player=(player_x+x,player_y+y)
+            self.player = (player_x + x, player_y + y)
             self.set_cell_content(player_x, player_y, new_player_cell)
             self.set_cell_content(player_x + x, player_y + y, new_target_cell)
 
+
 class NodeSokoban:
-    def __init__(self, level_state, player, boxes, goals):
-        self.level_state = level_state
+    def __init__(self, player: Tuple[int, int], boxes: Set[Tuple[int, int]]):
         self.player = player
-        self.boxes = boxes
-        self.goals = goals
+        self.boxes = copy.deepcopy(boxes)
 
     def __key(self):
-        hashable_matrix = tuple(tuple(row) for row in self.level_state)
-        return hash(hashable_matrix)
+        return (self.player, frozenset(self.boxes))
 
     def __hash__(self):
         return hash(self.__key())
-
-    def get_level_state(self):
-        return self.level_state
 
     def get_player(self):
         return self.player
@@ -307,32 +354,24 @@ class NodeSokoban:
     def get_boxes(self):
         return self.boxes
 
-    def get_goals(self):
-        return self.goals
-
     def __str__(self):
-        string = ""
-        for row in self.level_state:
-            for char in row:
-                string += char.value
-            string += '\n'
-        return string
+        return "Player: " + str(self.player) + " Boxes: " + str(self.boxes) + "\n"
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.level_state == other.level_state
+        return isinstance(other, self.__class__) and self.__key() == other.__key()
 
-    def manhattan(self):
+    def manhattan(self, goals):
         x, y = self.player
 
-        playerToBoxes = 0;
+        playerToBoxes = 0
 
-        for  e in self.boxes:
+        for e in self.boxes:
             bx, by = e
             playerToBoxes += abs(x - bx) + abs(y - by)
 
         boxesToStorages = 0
 
-        for e in self.goals:
+        for e in goals:
             ex, ey = e
 
             minDistance = 0
@@ -344,4 +383,4 @@ class NodeSokoban:
 
             boxesToStorages += minDistance
 
-        return playerToBoxes+boxesToStorages
+        return playerToBoxes + boxesToStorages

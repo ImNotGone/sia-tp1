@@ -175,14 +175,6 @@ class Sokoban:
             print(row_str, end="\n")
 
     def get_cell_content(self, x: int, y: int) -> Icons:
-        if (
-            x < 0
-            or y < 0
-            or y >= len(self.level_state)
-            or x >= len(self.level_state[y])
-        ):
-            return self.Icons.WALL
-
         return self.level_state[y][x]
 
     def set_cell_content(self, x: int, y: int, content: Icons):
@@ -287,6 +279,17 @@ class Sokoban:
             self.Icons.BOX,
             self.Icons.BOX_ON_GOAL,
         ]
+
+        # Check that nor x nor y are out of bounds
+        player_x, player_y = self.player
+        if (
+            player_x + x + 1 < 0
+            or player_y + y + 1 < 0
+            or player_y + y + 1 >= len(self.level_state)
+            or player_x + x + 1 >= len(self.level_state[player_y + y])
+        ):
+            return False
+
         box_can_be_pushed = self._next(x + x, y + y) in [
             self.Icons.FLOOR,
             self.Icons.GOAL,

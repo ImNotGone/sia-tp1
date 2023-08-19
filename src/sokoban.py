@@ -332,7 +332,7 @@ class Sokoban:
 class NodeSokoban:
     def __init__(self, player: Tuple[int, int], boxes: Set[Tuple[int, int]]):
         self.player = player
-        self.boxes = copy.deepcopy(boxes)
+        self.boxes = boxes
 
     def __key(self):
         return (self.player, frozenset(self.boxes))

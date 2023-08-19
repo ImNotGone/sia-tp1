@@ -275,7 +275,7 @@ class Sokoban:
             player_x + 2 * x < 0
             or player_y + 2 * y < 0
             or player_y + 2 * y >= len(self.level_state)
-            or player_x + 2 * x >= len(self.level_state[player_y + y])
+            or player_x + 2 * x >= len(self.level_state[player_y + 2 * y])
         ):
             return False
 

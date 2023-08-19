@@ -31,7 +31,7 @@ def greedy(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
         player = s_node.get_player()
         boxes = s_node.get_boxes()
 
-        sokoban.set_status(player, boxes)
+        sokoban.set_state(player, boxes)
 
         # Get all adjacent vertices of the dequeued vertex s.
         for direction in sokoban.get_valid_directions():
@@ -55,7 +55,7 @@ def greedy(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
                     break
 
             # We go back to the parent state we were evaluating
-            sokoban.set_status(player, boxes)
+            sokoban.set_state(player, boxes)
 
     end_time = time.time()
     elapsed_time = end_time - start_time

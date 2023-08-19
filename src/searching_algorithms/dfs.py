@@ -30,7 +30,6 @@ def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
 
         # Get all adjacent vertices of the dequeued vertex s.
         for direction in sokoban.get_valid_directions():
-            if sokoban.can_move(direction) or sokoban.can_push(direction):
                 sokoban.move_player(direction)
                 current_node = NodeSokoban(sokoban.get_player(), sokoban.get_boxes())
                 if not sokoban.level_failed() and current_node not in parents:

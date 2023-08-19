@@ -272,10 +272,10 @@ class Sokoban:
         # Check that nor x nor y are out of bounds
         player_x, player_y = self.player
         if (
-            player_x + x + 1 < 0
-            or player_y + y + 1 < 0
-            or player_y + y + 1 >= len(self.level_state)
-            or player_x + x + 1 >= len(self.level_state[player_y + y])
+            player_x + 2 * x < 0
+            or player_y + 2 * y < 0
+            or player_y + 2 * y >= len(self.level_state)
+            or player_x + 2 * x >= len(self.level_state[player_y + y])
         ):
             return False
 

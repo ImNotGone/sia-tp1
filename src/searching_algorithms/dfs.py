@@ -13,15 +13,14 @@ def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
 
     # Create a set for DFS with the level state in the first item of the set
     stack = []
-    i = 0
     current_node = NodeSokoban(initial_player, initial_boxes)
-    stack.append((i, current_node))
+    stack.append(current_node)
 
     # Create the dictionary for parents so i can reconstruct path
     parents = {}
 
     while stack and not sokoban.level_complete():
-        s_node = stack.pop()[1]
+        s_node = stack.pop()
 
         player = s_node.get_player()
         boxes = s_node.get_boxes()
@@ -30,15 +29,17 @@ def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
 
         # Get all adjacent vertices of the dequeued vertex s.
         for direction in sokoban.get_valid_directions():
-                sokoban.move_player(direction)
-                current_node = NodeSokoban(sokoban.get_player(), sokoban.get_boxes())
-                if not sokoban.level_failed() and current_node not in parents:
-                    i += 1
-                    stack.append((i, current_node))
-                    parents[current_node] = s_node
-                    if sokoban.level_complete():
-                        break
-                sokoban.set_status(player, boxes)
+            sokoban.move_player(direction)
+            current_node = NodeSokoban(sokoban.get_player(), sokoban.get_boxes())
+
+            if not sokoban.level_failed() and current_node not in parents:
+                stack.append(current_node)
+                parents[current_node] = s_node
+
+                if sokoban.level_complete():
+                    break
+
+            sokoban.set_status(player, boxes)
 
     end_time = time.time()
     elapsed_time = end_time - start_time

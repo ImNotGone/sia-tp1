@@ -27,7 +27,7 @@ def main():
         search_algorithm = config["searching_algorithm"]
 
         print(f"Calculating solution using {search_algorithm} algorithm")
-        sokoban.print_level_state()
+        print(sokoban)
         print(f"Level: {level}")
 
         # TODO: Inject euristic function to searching algorithm
@@ -41,19 +41,27 @@ def main():
             case _:
                 raise Exception("Invalid searching algorithm")
 
+
+        print(f"Elapsed time: {elapsed_time}")
+        print(f"Number of steps: {len(path_to_solution)}")
+
+        user_input = input("Press enter to see solution or q to exit")
+
+        if user_input == "q":
+            exit(0)
+        
                 
         # Print solution
         for node in path_to_solution:
             # Clear screen
             print("\033c", end="")
 
-            sokoban.set_status(node.get_player(), node.get_boxes())
-            sokoban.print_level_state()
+            sokoban.set_state(node.get_player(), node.get_boxes())
+            print(sokoban)
 
             time.sleep(0.1)
 
-        print(f"Elapsed time: {elapsed_time}")
-        print(f"Number of steps: {len(path_to_solution)}")
+
 
 
 if __name__ == "__main__":

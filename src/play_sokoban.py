@@ -5,7 +5,7 @@ def play(sokoban: Sokoban):
         valid = False
         dir = Sokoban.Direction.NONE
         while (not valid):
-            sokoban.print_level_state()
+            print(sokoban) 
             key = input("wasdq:")
             valid = True
             if key == "w":
@@ -23,7 +23,7 @@ def play(sokoban: Sokoban):
             if (valid and sokoban.can_move(dir) or sokoban.can_push(dir)):
                 sokoban.move_player(dir)
 
-    sokoban.print_level_state()
+    print(sokoban)
     if (sokoban.level_complete()):
         print("Level complete!")
     else:

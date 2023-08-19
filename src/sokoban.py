@@ -198,23 +198,20 @@ class Sokoban:
         # return self._level_failed
         for box in self.boxes:
             if box not in self.goals:
-                walls_in = set()
-                for direction in Sokoban.Direction:
-                    if (
-                        self.get_cell_content(
-                            box[0] + direction.value[0], box[1] + direction.value[1]
-                        )
-                        == Sokoban.Icons.WALL
-                    ):
-                        walls_in.add(direction)
-                if (
-                    Sokoban.Direction.UP in walls_in
-                    or Sokoban.Direction.DOWN in walls_in
-                ) and (
-                    Sokoban.Direction.LEFT in walls_in
-                    or Sokoban.Direction.RIGHT in walls_in
-                ):
+                box_x, box_y = box
+
+                has_adjacent_wall_y = (
+                    self.get_cell_content(box_x, box_y - 1) == Sokoban.Icons.WALL
+                    or self.get_cell_content(box_x, box_y + 1) == Sokoban.Icons.WALL
+                )
+                has_adjacent_wall_x = (
+                    self.get_cell_content(box_x - 1, box_y) == Sokoban.Icons.WALL
+                    or self.get_cell_content(box_x + 1, box_y) == Sokoban.Icons.WALL
+                )
+
+                if has_adjacent_wall_x and has_adjacent_wall_y:
                     return True
+
         return False
 
     # private
@@ -248,14 +245,6 @@ class Sokoban:
         self.set_cell_content(x, y, new_box_cell)
         self.set_cell_content(x + x_diff, y + y_diff, new_target_cell)
 
-        """
-        if new_point not in self.goals:
-            walls_in = set()
-            for direction in Sokoban.Direction:
-                if(self.get_cell_content(new_point[0]+direction.value[0], new_point[1]+direction.value[1]) == Sokoban.Icons.WALL):
-                    walls_in.add(direction)
-            self._level_failed = (Sokoban.Direction.UP in walls_in or Sokoban.Direction.DOWN in walls_in) and (Sokoban.Direction.LEFT in walls_in or Sokoban.Direction.RIGHT in walls_in)
-        """
 
     def can_move(self, direction: Direction) -> bool:
         player_x, player_y = self.player

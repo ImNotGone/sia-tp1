@@ -1,4 +1,3 @@
-
 from typing import Tuple, List
 from queue import PriorityQueue
 from src.sokoban import Sokoban, NodeSokoban
@@ -7,7 +6,7 @@ import time
 
 
 # Function to print a BFS of graph
-def bfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float, int]:
+def bfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float, int, int]:
     start_time = time.time()
 
     initial_player = sokoban.get_player()
@@ -53,12 +52,13 @@ def bfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float, int]:
     path_to_solution = reconstruct_path(
         parents, current_node, NodeSokoban(initial_player, initial_boxes)
     )
+    frontier_nodes = len(queue)
 
-    return path_to_solution, elapsed_time, nodes_expanded
+    return path_to_solution, elapsed_time, nodes_expanded, frontier_nodes
 
 
 # Function to print a DFS of graph
-def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float, int]:
+def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float, int, int]:
     start_time = time.time()
 
     initial_player = sokoban.get_player()
@@ -101,5 +101,6 @@ def dfs(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float, int]:
     path_to_solution = reconstruct_path(
         parents, current_node, NodeSokoban(initial_player, initial_boxes)
     )
+    frontier_nodes = len(stack)
 
-    return path_to_solution, elapsed_time, nodes_expanded
+    return path_to_solution, elapsed_time, nodes_expanded, frontier_nodes

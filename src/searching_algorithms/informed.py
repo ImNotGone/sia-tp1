@@ -7,7 +7,7 @@ import time
 
 def greedy(
     sokoban: Sokoban, heuristic: Callable[[Sokoban], int]
-) -> Tuple[list[NodeSokoban], float, int]:
+) -> Tuple[list[NodeSokoban], float, int, int]:
     start_time = time.time()
 
     initial_player = sokoban.get_player()
@@ -64,20 +64,20 @@ def greedy(
     path_to_solution = reconstruct_path(
         parents, current_node, NodeSokoban(initial_player, initial_boxes)
     )
+    frontier_nodes = len(queue)
 
-    return path_to_solution, elapsed_time, nodes_expanded
+    return path_to_solution, elapsed_time, nodes_expanded, frontier_nodes
 
 
 def a_star(
-    sokoban: Sokoban,
-    heuristic: Callable[[Sokoban], int]
-) -> Tuple[list[NodeSokoban], float, int]:
+    sokoban: Sokoban, heuristic: Callable[[Sokoban], int]
+) -> Tuple[list[NodeSokoban], float, int, int]:
     start_time = time.time()
 
     initial_player = sokoban.get_player()
     initial_boxes = sokoban.get_boxes()
 
-    # Create a priority queue for A* 
+    # Create a priority queue for A*
     # with the initial level_state as the first item in the queue
     queue: List[Tuple[int, int, NodeSokoban]] = []
 
@@ -85,11 +85,9 @@ def a_star(
 
     current_node = NodeSokoban(initial_player, initial_boxes)
     distance_to_goal = heuristic(sokoban)
-    heappush(
-        queue, (distance_to_goal, nodes_expanded, current_node)
-    )
+    heappush(queue, (distance_to_goal, nodes_expanded, current_node))
 
-    # Create dictionary for parents and g_costs 
+    # Create dictionary for parents and g_costs
     # so that I can reconstruct path and track g costs
     parents = {}
     g_costs = {current_node: 0}
@@ -136,5 +134,6 @@ def a_star(
     path_to_solution = reconstruct_path(
         parents, current_node, NodeSokoban(initial_player, initial_boxes)
     )
+    frontier_nodes = len(queue)
 
-    return path_to_solution, elapsed_time, nodes_expanded
+    return path_to_solution, elapsed_time, nodes_expanded, frontier_nodes

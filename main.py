@@ -26,6 +26,7 @@ heuristics = {
     "manhattan_distance_with_walls": manhattan_distance_with_walls,
 }
 
+
 def main():
     config_file = "config.json"
 
@@ -43,7 +44,6 @@ def main():
 
         search_algorithm = config["searching_algorithm"]
 
-
         if search_algorithm in informed_searching_algorithms:
             heuristic = config["heuristic"]
             if heuristic not in heuristics:
@@ -58,9 +58,12 @@ def main():
 
             search_algorithm = informed_searching_algorithms[search_algorithm]
 
-            path_to_solution, elapsed_time, nodes_expanded = search_algorithm(
-                sokoban, heuristic_function
-            )
+            (
+                path_to_solution,
+                elapsed_time,
+                nodes_expanded,
+                frontier_nodes,
+            ) = search_algorithm(sokoban, heuristic_function)
 
         elif search_algorithm in uninformed_searching_algorithms:
             print(f"Calculating solution using {search_algorithm} algorithm")
@@ -69,13 +72,19 @@ def main():
 
             search_algorithm = uninformed_searching_algorithms[search_algorithm]
 
-            path_to_solution, elapsed_time, nodes_expanded = search_algorithm(sokoban)
+            (
+                path_to_solution,
+                elapsed_time,
+                nodes_expanded,
+                frontier_nodes,
+            ) = search_algorithm(sokoban)
         else:
             raise Exception("Invalid searching algorithm")
 
         print(f"Elapsed time: {elapsed_time}")
         print(f"Number of steps: {len(path_to_solution)}")
         print(f"Nodes expanded: {nodes_expanded}")
+        print(f"Frontier nodes: {frontier_nodes}")
 
         user_input = input("Press enter to see solution or q to exit")
 

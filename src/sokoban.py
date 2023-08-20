@@ -246,28 +246,3 @@ class NodeSokoban:
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__key() == other.__key()
-
-    def manhattan(self, goals):
-        x, y = self.player
-
-        playerToBoxes = 0
-
-        for e in self.boxes:
-            bx, by = e
-            playerToBoxes += abs(x - bx) + abs(y - by)
-
-        boxesToStorages = 0
-
-        for e in goals:
-            ex, ey = e
-
-            minDistance = 0
-
-            for m in self.boxes:
-                mx, my = m
-                distance = abs(ex - mx) + abs(ey - my)
-                minDistance = min(minDistance, distance)
-
-            boxesToStorages += minDistance
-
-        return playerToBoxes + boxesToStorages

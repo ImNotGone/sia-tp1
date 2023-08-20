@@ -7,10 +7,8 @@ from src.heuristics.manhattan_distance import (
 from src.sokoban import Sokoban
 from src.play_sokoban import play
 
-from src.searching_algorithms.bfs import bfs
-from src.searching_algorithms.dfs import dfs
-from src.searching_algorithms.greedy import greedy
-
+from src.searching_algorithms.informed import a_star, greedy
+from src.searching_algorithms.uninformed import bfs, dfs
 
 informed_searching_algorithms = {
     "greedy": greedy,

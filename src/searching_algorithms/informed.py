@@ -1,11 +1,13 @@
-from typing import Tuple, List
+from typing import Tuple, List, Callable
 from heapq import heappop, heappush
 from src.sokoban import Sokoban, NodeSokoban
 from src.utils import reconstruct_path
 import time
 
 
-def greedy(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
+def greedy(
+    sokoban: Sokoban, heuristic: Callable[[Sokoban], int]
+) -> Tuple[list[NodeSokoban], float, int]:
     start_time = time.time()
 
     initial_player = sokoban.get_player()
@@ -14,12 +16,11 @@ def greedy(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
     # Create a queue for BFS with the initial level_state as the first item in the queue
     queue: List[Tuple[int, int, NodeSokoban]] = []
 
-    iterations = 0
+    nodes_expanded = 0
 
     current_node = NodeSokoban(initial_player, initial_boxes)
-    heappush(
-        queue, (current_node.manhattan(sokoban.get_goals()), iterations, current_node)
-    )
+    distance_to_goal = heuristic(sokoban)
+    heappush(queue, (distance_to_goal, nodes_expanded, current_node))
 
     # Create dictionary for parents so that I can reconstruct path
     parents = {}
@@ -39,13 +40,14 @@ def greedy(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
             current_node = NodeSokoban(sokoban.get_player(), sokoban.get_boxes())
 
             if not sokoban.level_failed() and current_node not in parents:
-                iterations += 1
+                nodes_expanded += 1
 
+                distance_to_goal = heuristic(sokoban)
                 heappush(
                     queue,
                     (
-                        current_node.manhattan(sokoban.get_goals()),
-                        iterations,
+                        distance_to_goal,
+                        nodes_expanded,
                         current_node,
                     ),
                 )
@@ -63,4 +65,6 @@ def greedy(sokoban: Sokoban) -> Tuple[list[NodeSokoban], float]:
         parents, current_node, NodeSokoban(initial_player, initial_boxes)
     )
 
-    return path_to_solution, elapsed_time
+    return path_to_solution, elapsed_time, nodes_expanded
+
+

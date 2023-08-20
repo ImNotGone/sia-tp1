@@ -1,6 +1,8 @@
 import sys
 from src.sokoban import Sokoban
 
+# Calculate the manhattan distance from the player to the closest box
+# and the sum of the manhattan distances from the boxes to the closest goal
 def admissible_manhattan_distance(sokoban: Sokoban) -> int:
     player_x, player_y = sokoban.get_player()
 
@@ -25,7 +27,9 @@ def admissible_manhattan_distance(sokoban: Sokoban) -> int:
 
     return distance_player_to_closest_box + sum_distance_boxes_to_goals
 
-# Same idea but we take into account the walls
+# Calculate the manhattan distance from the player to the closest box
+# and the sum of the manhattan distances from the boxes to the closest goal
+# but this time we take into account the walls because we can't move through them
 def manhattan_distance_with_walls(sokoban: Sokoban) -> int:
     board = sokoban.get_board()
     boxes = sokoban.get_boxes()

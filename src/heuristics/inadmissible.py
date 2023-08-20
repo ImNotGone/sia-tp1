@@ -1,5 +1,9 @@
 from src.sokoban import Sokoban
 
+# Sum the manhattan distances from the player to the boxes
+# Sum the manhattan distances from the boxes to the closest goal
+# This heuristic is inadmissible because when a player gets close to a box
+# it may also be getting close to another box
 def inadmissible_manhattan_distance(sokoban: Sokoban) -> int:
     x, y = sokoban.get_player()
 

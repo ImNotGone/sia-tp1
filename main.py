@@ -12,6 +12,7 @@ from src.searching_algorithms.uninformed import bfs, dfs
 
 informed_searching_algorithms = {
     "greedy": greedy,
+    "a_star": a_star,
 }
 uninformed_searching_algorithms = {
     "bfs": bfs,

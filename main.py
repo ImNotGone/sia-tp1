@@ -1,6 +1,10 @@
 import json
 import time
 from src.heuristics.unadmisible import unadmisible_manhattan_distance
+from src.heuristics.admisible import (
+    admissible_manhattan_distance,
+    manhattan_distance_with_walls,
+)
 
 from src.sokoban import Sokoban
 from src.play_sokoban import play
@@ -17,7 +21,9 @@ uninformed_searching_algorithms = {
     "dfs": dfs,
 }
 heuristics = {
+    "admissible_manhattan_distance": admissible_manhattan_distance,
     "unadmisible_manhattan_distance": unadmisible_manhattan_distance,
+    "manhattan_distance_with_walls": manhattan_distance_with_walls,
 }
 
 def main():

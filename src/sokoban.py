@@ -117,6 +117,9 @@ class Sokoban:
     def get_goals(self):
         return self._goals
 
+    def get_board(self):
+        return self._board
+
     def set_state(self, player: Tuple[int, int], boxes: Set[Tuple[int, int]]):
         self._player = player
         self._boxes = copy.deepcopy(boxes)

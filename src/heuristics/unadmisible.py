@@ -1,4 +1,3 @@
-import sys
 from src.sokoban import Sokoban
 
 def unadmisible_manhattan_distance(sokoban: Sokoban) -> int:

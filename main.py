@@ -1,6 +1,6 @@
 import json
 import time
-from src.heuristics.unadmisible import unadmisible_manhattan_distance
+from src.heuristics.inadmissible import inadmissible_manhattan_distance
 from src.heuristics.admisible import (
     admissible_manhattan_distance,
     manhattan_distance_with_walls,
@@ -22,7 +22,7 @@ uninformed_searching_algorithms = {
 }
 heuristics = {
     "admissible_manhattan_distance": admissible_manhattan_distance,
-    "unadmisible_manhattan_distance": unadmisible_manhattan_distance,
+    "inadmissible_manhattan_distance": inadmissible_manhattan_distance,
     "manhattan_distance_with_walls": manhattan_distance_with_walls,
 }
 

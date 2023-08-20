@@ -1,6 +1,6 @@
 from src.sokoban import Sokoban
 
-def unadmisible_manhattan_distance(sokoban: Sokoban) -> int:
+def inadmissible_manhattan_distance(sokoban: Sokoban) -> int:
     x, y = sokoban.get_player()
 
     playerToBoxes = 0

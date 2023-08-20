@@ -1,8 +1,6 @@
 import json
 import time
-from src.heuristics.manhattan_distance import (
-    unadmisible_manhattan_distance,
-)
+from src.heuristics.unadmisible import unadmisible_manhattan_distance
 
 from src.sokoban import Sokoban
 from src.play_sokoban import play

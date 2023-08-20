@@ -1,8 +1,6 @@
 import sys
 from src.sokoban import Sokoban
 
-
-
 def unadmisible_manhattan_distance(sokoban: Sokoban) -> int:
     x, y = sokoban.get_player()
 
@@ -27,4 +25,3 @@ def unadmisible_manhattan_distance(sokoban: Sokoban) -> int:
         boxesToStorages += minDistance
 
     return playerToBoxes + boxesToStorages
-

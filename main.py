@@ -38,10 +38,6 @@ def main():
 
         sokoban = Sokoban(level, levels_file)
 
-        if config["user_play"]:
-            play(sokoban)
-            exit(0)
-
         search_algorithm = config["searching_algorithm"]
 
         if search_algorithm in informed_searching_algorithms:
@@ -78,6 +74,9 @@ def main():
                 nodes_expanded,
                 frontier_nodes,
             ) = search_algorithm(sokoban)
+        elif search_algorithm == "human":
+            play(sokoban)
+            exit(0)
         else:
             raise Exception("Invalid searching algorithm")
 

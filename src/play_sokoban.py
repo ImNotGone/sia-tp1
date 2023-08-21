@@ -6,6 +6,7 @@ def play(sokoban: Sokoban):
         valid = False
         dir = Sokoban.Direction.NONE
         while (not valid):
+            print("\033[H\033[J")
             print(sokoban) 
             key = input("wasdq:")
             valid = True

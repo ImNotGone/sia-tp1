@@ -51,9 +51,7 @@ def walkable_distance(sokoban: Sokoban) -> int:
         if ((box_x, box_y), (player_x, player_y)) in distance_point_to_point:
             distance = distance_point_to_point[((box_x, box_y), (player_x, player_y))]
         else:
-            distance = walkable_distance_helper(
-                board, player_x, player_y, box_x, box_y
-            )
+            distance = walkable_distance_helper(board, player_x, player_y, box_x, box_y)
             distance_point_to_point[((box_x, box_y), (player_x, player_y))] = distance
             distance_point_to_point[((player_x, player_y), (box_x, box_y))] = distance
 
@@ -68,9 +66,7 @@ def walkable_distance(sokoban: Sokoban) -> int:
             if ((box_x, box_y), (goal_x, goal_y)) in distance_point_to_point:
                 distance = distance_point_to_point[((box_x, box_y), (goal_x, goal_y))]
             else:
-                distance = walkable_distance_helper(
-                    board, box_x, box_y, goal_x, goal_y
-                )
+                distance = walkable_distance_helper(board, box_x, box_y, goal_x, goal_y)
                 distance_point_to_point[((box_x, box_y), (goal_x, goal_y))] = distance
                 distance_point_to_point[((goal_x, goal_y), (box_x, box_y))] = distance
 

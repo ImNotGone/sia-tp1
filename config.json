@@ -1,7 +1,6 @@
 {
-  "user_play": false,
-  "searching_algorithm": "bfs",
-  "heuristic": "manhattan",
-  "level": 54,
+  "searching_algorithm": "human",
+  "heuristic": "walkable_distance",
+  "level": 4,
   "levels_file": "levels.txt"
 }

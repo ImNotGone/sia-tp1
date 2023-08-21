@@ -3,7 +3,7 @@ import time
 from src.heuristics.inadmissible import inadmissible_manhattan_distance
 from src.heuristics.admisible import (
     admissible_manhattan_distance,
-    manhattan_distance_with_walls,
+    walkable_distance,
 )
 
 from src.sokoban import Sokoban
@@ -23,7 +23,7 @@ uninformed_searching_algorithms = {
 heuristics = {
     "admissible_manhattan_distance": admissible_manhattan_distance,
     "inadmissible_manhattan_distance": inadmissible_manhattan_distance,
-    "manhattan_distance_with_walls": manhattan_distance_with_walls,
+    "walkable_distance": walkable_distance,
 }
 
 

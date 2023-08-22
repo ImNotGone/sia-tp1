@@ -1,6 +1,6 @@
 {
-  "searching_algorithm": "human",
+  "searching_algorithm": "greedy",
   "heuristic": "walkable_distance",
-  "level": 4,
+  "level": 56,
   "levels_file": "levels.txt"
 }

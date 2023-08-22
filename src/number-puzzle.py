@@ -18,9 +18,6 @@ class Board:
                 num *= 10
         self._numeric_board = num
 
-#    def __hash__(self) -> int:
-#        return self._numeric_board
-
     def getMatrix(self):
         return self._matrix
 
@@ -67,6 +64,12 @@ start_board = Board([
     [8, 7, 5],
 ])
 
+start_board = Board([
+    [6, 1, 4],
+    [8, 3, 2],
+    [0, 7, 5],
+])
+
 class Node:
     def __init__(self, board: Board, parent = None):
         self._board = board
@@ -76,19 +79,32 @@ class Node:
     def getBoard(self) -> Board:
         return self._board
 
-    def heuristica(self):
+    def calculate_distance(self, i, j):
+        for k in range(len(solved_board.getMatrix())):
+            for l in range(len(solved_board.getMatrix()[0])):
+                if(solved_board.getMatrix()[k][l] == self._board.getMatrix()[i][j]):
+                    return abs(i - k) + abs(l - j)
+        raise Exception("value not found")
+
+    def manhattan(self):
+        value = 0
+        for i in range(len(self._board.getMatrix())):
+            for j in range(len(self._board.getMatrix()[0])):
+                if(self._board.getMatrix()[i][j] != solved_board.getMatrix()[i][j] and self._board.getMatrix()[i][j] != 0):
+                    value += self.calculate_distance(i, j)
+        return value
+
+    def h2(self):
         sum = 0
         for i in range(len(self._board.getMatrix())):
             for j in range(len(self._board.getMatrix()[0])):
-                if(self._board.getMatrix()[i][j] != solved_board.getMatrix()[i][j]):
+                if(self._board.getMatrix()[i][j] != solved_board.getMatrix()[i][j] and self._board.getMatrix()[i][j] != 0):
                     sum += 1
         return sum
 
     def __lt__(self, other):
-        return self.heuristica() < other.heuristica()
+        return self.manhattan() < other.manhattan()
 
-#    def __hash__(self) -> int:
-#        return self._board.__hash__()
 
 def printMat(mat):
     for row in mat:
@@ -103,8 +119,6 @@ def show_path(node: Node):
     printMat(node.getBoard().getMatrix())
 
 seen = set()
-
-
 
 #start_board = Board([
 #    [1, 2, 3],
@@ -132,8 +146,8 @@ while(not queue.empty()):
                 print(i, "nodes expanded")
                 exit(0)
             current_node.children.append(new_node)
-            #if(board._numeric_board not in seen):
-            i += 1
-            queue.put(new_node)
+            if(board._numeric_board not in seen):
+                i += 1
+                queue.put(new_node)
             seen.add(board._numeric_board)
         current_node.children.append(None)

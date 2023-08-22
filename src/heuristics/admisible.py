@@ -30,7 +30,7 @@ def admissible_manhattan_distance(sokoban: Sokoban) -> int:
     return distance_player_to_closest_box + sum_distance_boxes_to_goals
 
 
-# Calculate the manhattan distance from the player to the closest box
+# Calculate the manhattan distance from the player to the closest box not in a goal
 # and the sum of the manhattan distances from the boxes to the closest goal
 # but this time we take into account the walls because we can't move through them
 # Uses dynamic programming to calculate the distances
@@ -48,6 +48,8 @@ def walkable_distance(sokoban: Sokoban) -> int:
     distance_player_to_closest_box = sys.maxsize
 
     for box_x, box_y in boxes:
+        if (box_x, box_y) in goals:
+            continue
         if ((box_x, box_y), (player_x, player_y)) in distance_point_to_point:
             distance = distance_point_to_point[((box_x, box_y), (player_x, player_y))]
         else:

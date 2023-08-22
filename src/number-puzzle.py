@@ -55,6 +55,18 @@ class Board:
 
         raise RuntimeError("0 not found")
 
+solved_board = Board([
+    [1, 2, 3],
+    [8, 0, 4],
+    [7, 6, 5],
+])
+
+start_board = Board([
+    [1, 3, 0],
+    [6, 2, 4],
+    [8, 7, 5],
+])
+
 class Node:
     def __init__(self, board: Board, parent = None):
         self._board = board
@@ -63,6 +75,17 @@ class Node:
 
     def getBoard(self) -> Board:
         return self._board
+
+    def heuristica(self):
+        sum = 0
+        for i in range(len(self._board.getMatrix())):
+            for j in range(len(self._board.getMatrix()[0])):
+                if(self._board.getMatrix()[i][j] != solved_board.getMatrix()[i][j]):
+                    sum += 1
+        return sum
+
+    def __lt__(self, other):
+        return self.heuristica() < other.heuristica()
 
 #    def __hash__(self) -> int:
 #        return self._board.__hash__()
@@ -79,19 +102,9 @@ def show_path(node: Node):
     print()
     printMat(node.getBoard().getMatrix())
 
-seen = []
+seen = set()
 
-solved_board = Board([
-    [1, 2, 3],
-    [8, 0, 4],
-    [7, 6, 5],
-])
 
-start_board = Board([
-    [5, 7, 3],
-    [8, 2, 0],
-    [1, 6, 4],
-])
 
 #start_board = Board([
 #    [1, 2, 3],
@@ -102,12 +115,11 @@ start_board = Board([
 root = Node(start_board)
 
 queue = PriorityQueue()
-i = 0
-queue.put((i, root))
-
+queue.put(root)
+i = 1
 found = False
 while(not queue.empty()):
-    current_node = queue.get()[1]
+    current_node = queue.get()
     # printMat(current_node.getBoard().getMatrix())
     current_node_board = current_node.getBoard()
     for move in Move:
@@ -117,12 +129,11 @@ while(not queue.empty()):
             if(board.getMatrix() == solved_board.getMatrix()):
                 found = True
                 show_path(new_node)
-                print(i)
+                print(i, "nodes expanded")
                 exit(0)
             current_node.children.append(new_node)
-            if(board.getMatrix() not in seen):
-                i += 1
-                queue.put((i, new_node))
-            seen.append(board.getMatrix())
+            #if(board._numeric_board not in seen):
+            i += 1
+            queue.put(new_node)
+            seen.add(board._numeric_board)
         current_node.children.append(None)
-
